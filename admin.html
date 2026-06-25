@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Graphic Design Form</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak" style="width:40px;height:40px;object-fit:contain; border-radius:8px;">
+      <div class="brand-block">
+        <span class="brand-eyebrow">Marketing Team</span>
+        <span class="brand-name">Office Desk Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="card" id="loginCard" style="max-width: 400px; margin: 0 auto;">
+      <h3 style="margin-top: 0;">Admin Login</h3>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password">
+      </div>
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div class="card" id="dashboardCard" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">Design Requests</h3>
+        <select id="filterStatus" onchange="loadData()" style="width: 200px;">
+          <option value="All">All Categories</option>
+          <option value="Pending">Pending</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+      
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Date Submit</th>
+              <th>Note</th>
+              <th>File</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script>
+    let requestData = [];
+
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (user === 'marketing' && pass === '123') {
+        document.getElementById('loginCard').style.display = 'none';
+        document.getElementById('dashboardCard').style.display = 'block';
+        loadData();
+      } else {
+        alert('Invalid credentials');
+      }
+    }
+
+    async function loadData() {
+      const tbody = document.getElementById('tableBody');
+      try {
+        const response = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getRequests`);
+        requestData = await response.json();
+        renderTable();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--color-error)">Failed to load data</td></tr>`;
+      }
+    }
+
+    function renderTable() {
+      const filter = document.getElementById('filterStatus').value;
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      const filtered = filter === 'All' ? requestData : requestData.filter(r => r.Status === filter);
+
+      if(filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No requests found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        const badgeClass = row.Status === 'Pending' ? 'pending' : 'done';
+        
+        // Memastikan parameter action muncul jika statusnya masih Pending
+        const actionBtn = row.Status === 'Pending' 
+          ? `<button class="btn-small" onclick="markAsDone(${index})">Mark as Done</button>` 
+          : `-`;
+
+        tr.innerHTML = `
+          <td>${row.Name}</td>
+          <td>${row.Department}</td>
+          <td>${row['Date Submit']}</td>
+          <td>${row.Notes}</td>
+          <td><a href="${row['File URL']}" target="_blank" style="color:var(--color-brand)">View File</a></td>
+          <td><span class="badge ${badgeClass}">${row.Status}</span></td>
+          <td>${actionBtn}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function markAsDone(rowIndex) {
+      // Temukan indeks asli berdasarkan data utuh, bukan data yg difilter
+      const filter = document.getElementById('filterStatus').value;
+      let actualIndex = rowIndex;
+      
+      if (filter !== 'All') {
+        const filtered = requestData.filter(r => r.Status === filter);
+        const item = filtered[rowIndex];
+        actualIndex = requestData.findIndex(r => r === item);
+      }
+
+      try {
+        await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=markDone&rowIndex=${actualIndex}`);
+        requestData[actualIndex].Status = 'Done'; // Update lokal
+        renderTable(); // Render ulang
+      } catch (err) {
+        alert('Failed to update status');
+      }
+    }
+  </script>
+</body>
+</html>
