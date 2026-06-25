@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphic Design Form - Marketing Team</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak" style="width:40px;height:40px;object-fit:contain; border-radius:8px;">
+      <div class="brand-block">
+        <span class="brand-eyebrow">Marketing Team</span>
+        <span class="brand-name">Office Desk</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="notice">
+        Please ensure that all materials, information, and details are final and approved before filling out this form.
+      </div>
+
+      <form id="designForm">
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+          <label>Department *</label>
+          <select id="department" required>
+            <option value="">Select Department</option>
+            <option value="A&G">A&G</option>
+            <option value="Sales & Marketing">Sales & Marketing</option>
+            <option value="Front Office">Front Office</option>
+            <option value="Housekeeping">Housekeeping</option>
+            <option value="Kahyangan Spa">Kahyangan Spa</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Food & Beverage">Food & Beverage</option>
+            <option value="Accounting">Accounting</option>
+            <option value="HRD">HRD</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Deadline (dd/mm/yy) *</label>
+          <input type="date" id="deadline" required>
+        </div>
+        <div class="form-group">
+          <label>File Uploads (Word, Excel, PDF) *</label>
+          <input type="file" id="file" accept=".doc,.docx,.xls,.xlsx,.pdf" required>
+          <small style="color: var(--muted); font-size: 12px; display: block; margin-top: 4px;">Explain in detail, comprehensively, and accompanied by images</small>
+        </div>
+        <div class="form-group">
+          <label>Notes *</label>
+          <textarea id="notes" rows="4" required></textarea>
+        </div>
+        
+        <button type="submit" id="submitBtn">Submit Request</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    Created by yog - 2026 &nbsp; &nbsp; <a href="admin.html" id="adminLoginLink">Login</a>
+  </footer>
+  <div id="toast"></div>
+
+  <script src="config.js"></script>
+  <script>
+    const showToast = (msg) => {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 4000);
+    }
+
+    document.getElementById('designForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = 'Submitting...';
+      btn.disabled = true;
+
+      const fileInput = document.getElementById('file').files[0];
+      const reader = new FileReader();
+
+      reader.onload = async function() {
+        const base64String = reader.result.split(',')[1];
+        
+        const payload = {
+          email: document.getElementById('email').value,
+          name: document.getElementById('name').value,
+          department: document.getElementById('department').value,
+          deadline: document.getElementById('deadline').value,
+          notes: document.getElementById('notes').value,
+          fileName: fileInput.name,
+          mimeType: fileInput.type,
+          fileBase64: base64String
+        };
+
+        try {
+          await fetch(CONFIG.GAS_WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          showToast('Request submitted successfully!');
+          document.getElementById('designForm').reset();
+        } catch (err) {
+          showToast('Error submitting request.');
+        } finally {
+          btn.innerText = 'Submit Request';
+          btn.disabled = false;
+        }
+      };
+      
+      if(fileInput) reader.readAsDataURL(fileInput);
+    });
+  </script>
+</body>
+</html>
