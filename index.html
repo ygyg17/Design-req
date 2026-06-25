@@ -2,17 +2,234 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Tag krusial untuk Mobile Responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Graphic Design Form - Marketing Team</title>
   
-  <!-- Import Font Modern dari Google -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Memanggil External CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* --- VARIABEL WARNA BRAND THE SEMINYAK --- */
+    :root {
+      --bg-color: #f4f4f5;
+      --surface: #ffffff;
+      --text-main: #27272a;
+      --text-muted: #71717a;
+      --border-color: #e4e4e7;
+      --brand-gold: #BA8F2E;
+      --brand-gold-hover: #9c7726;
+      --brand-gold-light: rgba(186, 143, 46, 0.08);
+      --success: #10b981;
+      --error: #ef4444;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 5%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .header-content {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-content img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 4px;
+      border: 1px solid var(--border-color);
+    }
+    .brand-block { display: flex; flex-direction: column; }
+    .brand-eyebrow { font-size: 11px; text-transform: uppercase; color: var(--brand-gold); font-weight: 700; letter-spacing: 1px; }
+    .brand-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+    /* --- MAIN CONTAINER --- */
+    main {
+      flex: 1;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .card {
+      background-color: var(--surface);
+      width: 100%;
+      max-width: 650px;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* --- NOTICE BOX --- */
+    .notice {
+      background-color: var(--brand-gold-light);
+      color: var(--brand-gold-hover);
+      padding: 16px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 32px;
+      border-left: 4px solid var(--brand-gold);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* --- FORM ELEMENTS --- */
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+    label span { color: var(--error); }
+
+    input[type="text"], input[type="email"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text-main);
+      background-color: #fafafa;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      background-color: var(--surface);
+      border-color: var(--brand-gold);
+      outline: none;
+      box-shadow: 0 0 0 4px var(--brand-gold-light);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+
+    /* --- CUSTOM FILE UPLOAD --- */
+    .file-drop-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      background-color: #fafafa;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-align: center;
+    }
+    .file-drop-area:hover, .file-drop-area.dragover {
+      background-color: var(--brand-gold-light);
+      border-color: var(--brand-gold);
+    }
+    .file-drop-area input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .file-msg {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--brand-gold);
+      margin-bottom: 4px;
+    }
+    .file-submsg {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* --- SUBMIT BUTTON --- */
+    button[type="submit"] {
+      background-color: var(--brand-gold);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(186, 143, 46, 0.3);
+    }
+    button[type="submit"]:hover {
+      background-color: var(--brand-gold-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(186, 143, 46, 0.4);
+    }
+    button:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+
+    /* Spinner */
+    .spinner {
+      display: none; width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- FOOTER --- */
+    footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
+    footer a { color: var(--brand-gold); text-decoration: none; font-weight: 600; margin-left: 8px; }
+
+    /* --- TOAST NOTIFICATION --- */
+    #toast {
+      position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+      background: #18181b; color: white; padding: 14px 24px; border-radius: 50px;
+      font-size: 14px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #toast.show { bottom: 30px; }
+    #toast.success { background: var(--success); }
+    #toast.error { background: var(--error); }
+
+    /* --- MOBILE RESPONSIVE TWEAKS --- */
+    @media (max-width: 600px) {
+      main { padding: 20px 16px; }
+      .card { padding: 24px; border-radius: 16px; }
+      .header-content img { width: 40px; height: 40px; }
+      .brand-name { font-size: 16px; }
+      button[type="submit"] { padding: 14px; font-size: 15px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -68,7 +285,6 @@
         
         <div class="form-group">
           <label>Supporting Files (Word, Excel, PDF) <span>*</span></label>
-          <!-- Desain Upload File Custom -->
           <div class="file-drop-area" id="dropArea">
             <svg style="margin-bottom: 8px; color: var(--brand-gold);" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
             <span class="file-msg" id="fileMsg">Click or drag file here to upload</span>
@@ -96,11 +312,9 @@
   
   <div id="toast">Message goes here</div>
 
-  <!-- Memanggil Config -->
   <script src="config.js"></script>
   
   <script>
-    // --- Logika Visual File Upload ---
     const fileInput = document.getElementById('file');
     const fileMsg = document.getElementById('fileMsg');
     const dropArea = document.getElementById('dropArea');
@@ -117,7 +331,6 @@
       }
     });
 
-    // --- Animasi Notifikasi (Toast) ---
     const showToast = (msg, type = 'success') => {
       const toast = document.getElementById('toast');
       toast.innerText = msg;
@@ -125,7 +338,6 @@
       setTimeout(() => { toast.className = toast.className.replace(`show ${type}`, ''); }, 4000);
     }
 
-    // --- Logika Pengiriman Form ---
     document.getElementById('designForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -133,7 +345,6 @@
       const btnText = document.getElementById('btnText');
       const spinner = document.getElementById('btnSpinner');
       
-      // UI Loading State
       btn.disabled = true;
       btnText.innerText = 'Submitting...';
       spinner.style.display = 'block';
@@ -163,7 +374,6 @@
           
           showToast('✓ Request submitted successfully!', 'success');
           
-          // Reset form dan tampilan file upload
           document.getElementById('designForm').reset();
           fileMsg.innerText = 'Click or drag file here to upload';
           dropArea.style.backgroundColor = '#fafafa';
@@ -172,7 +382,6 @@
         } catch (err) {
           showToast('✕ Error submitting request. Please try again.', 'error');
         } finally {
-          // Kembalikan UI Tombol
           btn.disabled = false;
           btnText.innerText = 'Submit Request';
           spinner.style.display = 'none';
