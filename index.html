@@ -10,6 +10,62 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── File list (multi-file) ───────────────────────────────────── */
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .file-list:empty { margin-top: 0; }
+    .file-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      color: var(--text);
+    }
+    .file-list-item svg { flex-shrink: 0; color: var(--text-muted); }
+    .file-list-item-name {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-list-item-size {
+      flex-shrink: 0;
+      color: var(--text-muted);
+      font-size: 11.5px;
+    }
+    .file-list-item-remove {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      width: auto;
+      margin: 0;
+      padding: 3px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      transition: color var(--transition), background var(--transition);
+    }
+    .file-list-item-remove:hover {
+      color: var(--error);
+      background: var(--error-bg);
+      transform: none;
+      box-shadow: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -82,16 +138,17 @@
         </div>
 
         <div class="form-group">
-          <label>Supporting File <span class="req" aria-hidden="true">*</span></label>
-          <p class="field-hint">Accepted: Word, Excel, PDF. Include images where possible.</p>
-          <div class="file-drop-area" id="dropArea" role="button" tabindex="0" aria-label="Upload supporting file">
+          <label>Supporting File(s) <span class="req" aria-hidden="true">*</span></label>
+          <p class="field-hint">Any file type accepted. You can upload multiple files at once.</p>
+          <div class="file-drop-area" id="dropArea" role="button" tabindex="0" aria-label="Upload supporting files">
             <div class="file-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
-            <span class="file-msg" id="fileMsg">Click or drag a file here</span>
-            <span class="file-submsg">.doc, .docx, .xls, .xlsx, .pdf</span>
-            <input type="file" id="file" name="file" accept=".doc,.docx,.xls,.xlsx,.pdf" required aria-label="Upload file">
+            <span class="file-msg" id="fileMsg">Click or drag file(s) here</span>
+            <span class="file-submsg">Any file type · multiple files allowed</span>
+            <input type="file" id="file" name="file" multiple aria-label="Upload files">
           </div>
+          <div class="file-list" id="fileList"></div>
           <span class="field-error" id="fileError"></span>
         </div>
 
@@ -119,31 +176,87 @@
 
   <script src="config.js"></script>
   <script>
-    // ── File upload feedback ──────────────────────────────────────────
+    // ── File upload feedback (multi-file) ──────────────────────────────
     const fileInput = document.getElementById('file');
     const fileMsg   = document.getElementById('fileMsg');
     const dropArea  = document.getElementById('dropArea');
+    const fileListEl = document.getElementById('fileList');
 
-    function updateFileUI(files) {
-      if (files && files.length > 0) {
-        fileMsg.textContent = files[0].name;
-        dropArea.classList.add('has-file');
-        document.getElementById('fileError').textContent = '';
-      } else {
-        fileMsg.textContent = 'Click or drag a file here';
-        dropArea.classList.remove('has-file');
-      }
+    // Menyimpan file terpilih secara independen dari fileInput.files,
+    // supaya kita bisa gabungkan file dari beberapa kali pilih/drag dan
+    // menghapus satu per satu.
+    let selectedFiles = [];
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
-    fileInput.addEventListener('change', e => updateFileUI(e.target.files));
+    function renderFileList() {
+      if (selectedFiles.length === 0) {
+        fileMsg.textContent = 'Click or drag file(s) here';
+        dropArea.classList.remove('has-file');
+        fileListEl.innerHTML = '';
+        return;
+      }
+
+      dropArea.classList.add('has-file');
+      fileMsg.textContent = selectedFiles.length === 1
+        ? selectedFiles[0].name
+        : `${selectedFiles.length} files selected`;
+
+      fileListEl.innerHTML = selectedFiles.map((f, i) => `
+        <div class="file-list-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="file-list-item-name">${f.name}</span>
+          <span class="file-list-item-size">${formatFileSize(f.size)}</span>
+          <button type="button" class="file-list-item-remove" data-remove-index="${i}" aria-label="Remove ${f.name}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      `).join('');
+
+      document.getElementById('fileError').textContent = '';
+    }
+
+    function addFiles(fileListInput) {
+      if (!fileListInput) return;
+      Array.from(fileListInput).forEach(f => {
+        // Hindari duplikat nama+ukuran kalau user pilih file yang sama dua kali
+        const dup = selectedFiles.some(sf => sf.name === f.name && sf.size === f.size);
+        if (!dup) selectedFiles.push(f);
+      });
+      renderFileList();
+    }
+
+    function removeFileAt(index) {
+      selectedFiles.splice(index, 1);
+      renderFileList();
+    }
+
+    fileListEl.addEventListener('click', e => {
+      const btn = e.target.closest('[data-remove-index]');
+      if (!btn) return;
+      removeFileAt(parseInt(btn.dataset.removeIndex, 10));
+    });
+
+    fileInput.addEventListener('change', e => {
+      addFiles(e.target.files);
+      fileInput.value = ''; // reset agar bisa pilih ulang file yang sama bila perlu
+    });
+
+    dropArea.addEventListener('click', e => {
+      if (e.target.closest('.file-list-item-remove')) return;
+      fileInput.click();
+    });
 
     dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
-    dropArea.addEventListener('dragleave', ()  => dropArea.classList.remove('dragover'));
+    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
     dropArea.addEventListener('drop', e => {
       e.preventDefault();
       dropArea.classList.remove('dragover');
-      fileInput.files = e.dataTransfer.files;
-      updateFileUI(e.dataTransfer.files);
+      addFiles(e.dataTransfer.files);
     });
     dropArea.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
 
@@ -178,10 +291,24 @@
                     { setError('email', 'Enter a valid email address.'); ok = false; }
       if (!dept)    { setError('department', 'Please select your department.'); ok = false; }
       if (!deadline){ setError('deadline', 'Please set a required deadline.'); ok = false; }
-      if (!fileInput.files[0]) { setError('file', 'Please upload a supporting file.'); ok = false; }
+      if (selectedFiles.length === 0) { setError('file', 'Please upload at least one supporting file.'); ok = false; }
       if (!notes)   { setError('notes', 'Please describe your design request.'); ok = false; }
 
       return ok;
+    }
+
+    // ── Helper: baca 1 file jadi base64 (Promise) ──────────────────────
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = () => resolve({
+          fileName: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          fileBase64: reader.result.split(',')[1]
+        });
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
     }
 
     // ── Form submit ───────────────────────────────────────────────────
@@ -197,11 +324,8 @@
       btnText.textContent = 'Submitting…';
       spinner.style.display = 'block';
 
-      const file   = fileInput.files[0];
-      const reader = new FileReader();
-
-      reader.onload = async () => {
-        const base64String = reader.result.split(',')[1];
+      try {
+        const files = await Promise.all(selectedFiles.map(readFileAsBase64));
 
         const payload = {
           email:      document.getElementById('email').value.trim(),
@@ -209,28 +333,23 @@
           department: document.getElementById('department').value,
           deadline:   document.getElementById('deadline').value,
           notes:      document.getElementById('notes').value.trim(),
-          fileName:   file.name,
-          mimeType:   file.type,
-          fileBase64: base64String
+          files:      files // array of { fileName, mimeType, fileBase64 }
         };
 
-        try {
-          await fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+        await fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
 
-          showToast('✓ Request submitted successfully!', 'success');
-          document.getElementById('designForm').reset();
-          updateFileUI(null);
+        showToast('✓ Request submitted successfully!', 'success');
+        document.getElementById('designForm').reset();
+        selectedFiles = [];
+        renderFileList();
 
-        } catch (err) {
-          showToast('✕ Submission failed. Check your connection and try again.', 'error');
-        } finally {
-          btn.disabled = false;
-          btnText.textContent = 'Submit Request';
-          spinner.style.display = 'none';
-        }
-      };
-
-      reader.readAsDataURL(file);
+      } catch (err) {
+        showToast('✕ Submission failed. Check your connection and try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Submit Request';
+        spinner.style.display = 'none';
+      }
     });
   </script>
 </body>
