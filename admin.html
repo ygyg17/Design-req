@@ -10,6 +10,217 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── Modal Overlay ─────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      animation: modal-in 0.2s ease;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-header-info { flex: 1; min-width: 0; }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .modal-meta {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      box-shadow: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      width: auto;
+      margin: 0;
+      flex-shrink: 0;
+      transition: color var(--transition), background var(--transition);
+    }
+    .modal-close:hover:not(:disabled) {
+      background: var(--surface-raised);
+      color: var(--text);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .modal-body {
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-field { display: flex; flex-direction: column; gap: 5px; }
+    .modal-field-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+    }
+    .modal-field-value {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 28px 24px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .modal-footer-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ── Confirm Dialog ────────────────────────────────────── */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .confirm-overlay.open { display: flex; }
+
+    .confirm-box {
+      background: var(--surface);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 400px;
+      padding: 28px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+      animation: modal-in 0.15s ease;
+    }
+    .confirm-icon {
+      width: 44px; height: 44px;
+      background: var(--error-bg);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      color: var(--error);
+    }
+    .confirm-title {
+      font-size: 16px; font-weight: 600;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .confirm-desc {
+      font-size: 13.5px; color: var(--text-muted);
+      line-height: 1.55; margin-bottom: 24px;
+    }
+    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── Row clickable ─────────────────────────────────────── */
+    tbody tr { cursor: pointer; }
+    tbody tr td.action-cell { cursor: default; }
+
+    /* ── Delete btn ────────────────────────────────────────── */
+    .btn-delete {
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1.5px solid #fca5a5;
+      box-shadow: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      width: auto;
+      margin-top: 0;
+    }
+    .btn-delete:hover:not(:disabled) {
+      background: #fecaca;
+      border-color: #f87171;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: #fff;
+      border: none;
+      box-shadow: none;
+      font-size: 14px;
+      padding: 10px 18px;
+      width: auto;
+      margin-top: 0;
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: #b91c1c;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-cancel {
+      background: var(--surface-raised);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+      box-shadow: none;
+      font-size: 14px;
+      padding: 10px 18px;
+      width: auto;
+      margin-top: 0;
+    }
+    .btn-cancel:hover:not(:disabled) {
+      background: var(--border);
+      color: var(--text);
+      transform: none;
+      box-shadow: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -25,13 +236,12 @@
 
   <main>
 
-    <!-- ── Login ─────────────────────────────────────────────── -->
+    <!-- ── Login ──────────────────────────────────────────── -->
     <div class="card login-card" id="loginCard">
       <div class="card-heading">
         <h1 class="card-title">Admin Login</h1>
         <p class="card-subtitle">Restricted to marketing team members only.</p>
       </div>
-
       <div class="form-group">
         <label for="username">Username</label>
         <input type="text" id="username" placeholder="Enter username" autocomplete="username">
@@ -41,13 +251,13 @@
         <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
       </div>
       <span class="field-error" id="loginError"></span>
-      <button onclick="login()" id="loginBtn">
+      <button onclick="login()">
         <span class="spinner" id="loginSpinner" aria-hidden="true"></span>
         <span id="loginBtnText">Log In</span>
       </button>
     </div>
 
-    <!-- ── Dashboard ──────────────────────────────────────────── -->
+    <!-- ── Dashboard ──────────────────────────────────────── -->
     <div class="card dashboard-card" id="dashboardCard" style="display:none;">
 
       <div class="dashboard-header">
@@ -64,16 +274,17 @@
             </select>
             <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
-          <button class="btn-outline" onclick="loadData()" id="refreshBtn" title="Refresh">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <button class="btn-outline" onclick="loadData()" title="Refresh">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             Refresh
           </button>
           <button class="btn-outline logout-btn" onclick="logout()">Log Out</button>
         </div>
       </div>
 
-      <!-- Stats strip -->
       <div class="stats-strip" id="statsStrip"></div>
+
+      <p class="table-hint">Click any row to view full details.</p>
 
       <div class="table-wrapper">
         <table>
@@ -83,14 +294,12 @@
               <th>Department</th>
               <th>Submitted</th>
               <th>Deadline</th>
-              <th>Brief</th>
-              <th>File</th>
               <th>Status</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="8" class="table-state">Loading requests…</td></tr>
+            <tr><td colspan="6" class="table-state">Loading requests…</td></tr>
           </tbody>
         </table>
       </div>
@@ -105,24 +314,95 @@
 
   <div id="toast" role="alert" aria-live="assertive"></div>
 
+  <!-- ── Detail Modal ──────────────────────────────────────── -->
+  <div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modalBox">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-title" id="modalName">—</div>
+          <div class="modal-meta" id="modalMeta">—</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div class="modal-field">
+            <span class="modal-field-label">Email</span>
+            <span class="modal-field-value" id="modalEmail">—</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Department</span>
+            <span class="modal-field-value" id="modalDept">—</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Date Submitted</span>
+            <span class="modal-field-value" id="modalSubmitted">—</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Deadline</span>
+            <span class="modal-field-value" id="modalDeadline">—</span>
+          </div>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field-label">Design Brief &amp; Notes</span>
+          <span class="modal-field-value" id="modalNotes">—</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <span id="modalStatus"></span>
+        <div class="modal-footer-actions">
+          <a class="file-link" id="modalFileLink" href="#" target="_blank" rel="noopener" style="display:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            View File
+          </a>
+          <button class="btn-action" id="modalMarkDoneBtn" onclick="markAsDoneFromModal()" style="display:none;">Mark as Done</button>
+          <button class="btn-delete" id="modalDeleteBtn" onclick="confirmDelete()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Confirm Delete Dialog ─────────────────────────────── -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="confirm-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="confirm-title">Delete this request?</div>
+      <p class="confirm-desc">This will permanently remove the request from the sheet. This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+        <button class="btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">
+          <span class="spinner" id="deleteSpinner" aria-hidden="true"></span>
+          <span id="deleteBtnText">Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="config.js"></script>
   <script>
-    let requestData = [];
+    let requestData  = [];
+    let activeIndex  = null; // index in requestData of currently open modal
 
-    // ── Auth ──────────────────────────────────────────────────────────
+    // ── Auth ────────────────────────────────────────────────
     function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value;
+      const user    = document.getElementById('username').value.trim();
+      const pass    = document.getElementById('password').value;
       const errorEl = document.getElementById('loginError');
 
-      if (!user || !pass) {
-        errorEl.textContent = 'Please enter both username and password.';
-        return;
-      }
+      if (!user || !pass) { errorEl.textContent = 'Please enter both username and password.'; return; }
 
       if (user === 'marketing' && pass === '123') {
         errorEl.textContent = '';
-        document.getElementById('loginCard').style.display = 'none';
+        document.getElementById('loginCard').style.display    = 'none';
         document.getElementById('dashboardCard').style.display = 'block';
         loadData();
       } else {
@@ -134,37 +414,32 @@
 
     function logout() {
       document.getElementById('dashboardCard').style.display = 'none';
-      document.getElementById('loginCard').style.display = 'block';
+      document.getElementById('loginCard').style.display     = 'block';
       document.getElementById('username').value = '';
       document.getElementById('password').value = '';
       requestData = [];
     }
 
-    // Allow Enter key on login fields
     ['username','password'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', e => {
-        if (e.key === 'Enter') login();
-      });
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
     });
 
-    // ── Data ──────────────────────────────────────────────────────────
+    // ── Data ────────────────────────────────────────────────
     async function loadData() {
       const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = `<tr><td colspan="8" class="table-state">
+      tbody.innerHTML = `<tr><td colspan="6" class="table-state">
         <span class="loading-dots"><span></span><span></span><span></span></span>
         Fetching requests…
       </td></tr>`;
 
       try {
-        const res = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getRequests`);
+        const res   = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getRequests`);
         requestData = await res.json();
         renderTable();
         updateStats();
       } catch {
-        tbody.innerHTML = `<tr><td colspan="8" class="table-state table-state--error">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Failed to load data. Check your connection and
-          <button class="link-btn" onclick="loadData()">try again</button>.
+        tbody.innerHTML = `<tr><td colspan="6" class="table-state table-state--error">
+          Failed to load data. <button class="link-btn" onclick="loadData()">Try again</button>
         </td></tr>`;
       }
     }
@@ -174,53 +449,43 @@
       const pending = requestData.filter(r => r.Status === 'Pending').length;
       const done    = requestData.filter(r => r.Status === 'Done').length;
 
-      document.getElementById('requestCount').textContent =
-        `${total} total request${total !== 1 ? 's' : ''}`;
-
+      document.getElementById('requestCount').textContent = `${total} total request${total !== 1 ? 's' : ''}`;
       document.getElementById('statsStrip').innerHTML = `
-        <div class="stat-pill stat-pill--all">
-          <span class="stat-num">${total}</span>
-          <span class="stat-label">Total</span>
-        </div>
-        <div class="stat-pill stat-pill--pending">
-          <span class="stat-num">${pending}</span>
-          <span class="stat-label">Pending</span>
-        </div>
-        <div class="stat-pill stat-pill--done">
-          <span class="stat-num">${done}</span>
-          <span class="stat-label">Done</span>
-        </div>
+        <div class="stat-pill stat-pill--all"><span class="stat-num">${total}</span><span class="stat-label">Total</span></div>
+        <div class="stat-pill stat-pill--pending"><span class="stat-num">${pending}</span><span class="stat-label">Pending</span></div>
+        <div class="stat-pill stat-pill--done"><span class="stat-num">${done}</span><span class="stat-label">Done</span></div>
       `;
     }
 
-    function formatDate(dateStr) {
-      if (!dateStr) return '—';
-      const d = new Date(dateStr);
-      return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    function formatDate(str) {
+      if (!str) return '—';
+      const d = new Date(str);
+      return isNaN(d) ? str : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    function truncate(str, n = 80) {
-      return str && str.length > n ? str.slice(0, n) + '…' : (str || '—');
+    function isOverdue(deadlineStr, isPending) {
+      if (!deadlineStr || !isPending) return false;
+      return new Date(deadlineStr) < new Date();
     }
 
+    // ── Render ──────────────────────────────────────────────
     function renderTable() {
       const filter = document.getElementById('filterStatus').value;
       const tbody  = document.getElementById('tableBody');
       tbody.innerHTML = '';
 
-      const rows = filter === 'All'
-        ? requestData
-        : requestData.filter(r => r.Status === filter);
+      const rows = filter === 'All' ? requestData : requestData.filter(r => r.Status === filter);
 
       if (rows.length === 0) {
-        const label = filter === 'All' ? 'No requests yet.' : `No ${filter.toLowerCase()} requests.`;
-        tbody.innerHTML = `<tr><td colspan="8" class="table-state">${label}</td></tr>`;
+        const msg = filter === 'All' ? 'No requests yet.' : `No ${filter.toLowerCase()} requests.`;
+        tbody.innerHTML = `<tr><td colspan="6" class="table-state">${msg}</td></tr>`;
         return;
       }
 
-      rows.forEach((row) => {
-        const actualIndex = requestData.indexOf(row);
-        const isPending   = row.Status === 'Pending';
+      rows.forEach(row => {
+        const idx       = requestData.indexOf(row);
+        const isPending = row.Status === 'Pending';
+        const overdue   = isOverdue(row.Deadline, isPending);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -232,40 +497,37 @@
           </td>
           <td>${row.Department || '—'}</td>
           <td class="date-cell">${formatDate(row['Date Submit'])}</td>
-          <td class="date-cell ${isOverdue(row.Deadline, isPending) ? 'overdue' : ''}">${formatDate(row.Deadline)}</td>
-          <td>
-            <span class="note-text" title="${(row.Notes || '').replace(/"/g, '&quot;')}">${truncate(row.Notes)}</span>
-          </td>
-          <td>
-            ${row['File URL']
-              ? `<a class="file-link" href="${row['File URL']}" target="_blank" rel="noopener">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  View
-                </a>`
-              : '—'}
-          </td>
+          <td class="date-cell ${overdue ? 'overdue' : ''}">${formatDate(row.Deadline)}</td>
           <td><span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span></td>
-          <td>
-            ${isPending
-              ? `<button class="btn-action" onclick="markAsDone(${actualIndex})">Mark Done</button>`
-              : `<span class="done-check">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Complete
-                </span>`}
+          <td class="action-cell">
+            <div class="row-actions">
+              ${isPending
+                ? `<button class="btn-action" onclick="event.stopPropagation(); markAsDone(${idx})">Mark Done</button>`
+                : `<span class="done-check">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Done
+                  </span>`}
+              <button class="btn-delete" onclick="event.stopPropagation(); openDeleteConfirm(${idx})">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Delete
+              </button>
+            </div>
           </td>
         `;
+
+        // clicking anywhere on the row (outside action-cell) opens modal
+        tr.addEventListener('click', e => {
+          if (!e.target.closest('.action-cell')) openModal(idx);
+        });
+
         tbody.appendChild(tr);
       });
     }
 
-    function isOverdue(deadlineStr, isPending) {
-      if (!deadlineStr || !isPending) return false;
-      return new Date(deadlineStr) < new Date();
-    }
-
+    // ── Mark Done ───────────────────────────────────────────
     async function markAsDone(index) {
-      const btn = document.querySelector(`button[onclick="markAsDone(${index})"]`);
-      if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
+      const btns = document.querySelectorAll(`button[onclick*="markAsDone(${index})"]`);
+      btns.forEach(b => { b.disabled = true; b.textContent = 'Updating…'; });
 
       try {
         await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=markDone&rowIndex=${index}`);
@@ -273,17 +535,119 @@
         renderTable();
         updateStats();
         showToast('✓ Request marked as done.', 'success');
+        // refresh modal if it's open for this row
+        if (activeIndex === index) openModal(index);
       } catch {
-        if (btn) { btn.disabled = false; btn.textContent = 'Mark Done'; }
-        showToast('✕ Failed to update status. Try again.', 'error');
+        btns.forEach(b => { b.disabled = false; b.textContent = 'Mark Done'; });
+        showToast('✕ Failed to update. Try again.', 'error');
       }
     }
 
-    // ── Toast ─────────────────────────────────────────────────────────
+    async function markAsDoneFromModal() {
+      if (activeIndex === null) return;
+      await markAsDone(activeIndex);
+    }
+
+    // ── Detail Modal ────────────────────────────────────────
+    function openModal(index) {
+      const row       = requestData[index];
+      if (!row) return;
+      activeIndex     = index;
+      const isPending = row.Status === 'Pending';
+
+      document.getElementById('modalName').textContent      = row.Name || '—';
+      document.getElementById('modalMeta').textContent      = `${row.Department || '—'} · Submitted ${formatDate(row['Date Submit'])}`;
+      document.getElementById('modalEmail').textContent     = row.Email || '—';
+      document.getElementById('modalDept').textContent      = row.Department || '—';
+      document.getElementById('modalSubmitted').textContent = formatDate(row['Date Submit']);
+      document.getElementById('modalDeadline').textContent  = formatDate(row.Deadline) + (isOverdue(row.Deadline, isPending) ? ' ⚠ Overdue' : '');
+      document.getElementById('modalNotes').textContent     = row.Notes || '—';
+
+      // status badge
+      document.getElementById('modalStatus').innerHTML =
+        `<span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span>`;
+
+      // file link
+      const fileLink = document.getElementById('modalFileLink');
+      if (row['File URL']) {
+        fileLink.href = row['File URL'];
+        fileLink.style.display = 'inline-flex';
+      } else {
+        fileLink.style.display = 'none';
+      }
+
+      // mark done button
+      document.getElementById('modalMarkDoneBtn').style.display = isPending ? 'inline-flex' : 'none';
+
+      document.getElementById('detailModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('detailModal')) closeModal();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+    });
+
+    // ── Delete ──────────────────────────────────────────────
+    function openDeleteConfirm(index) {
+      activeIndex = index;
+      document.getElementById('confirmOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function confirmDelete() {
+      // called from inside modal
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+
+    function closeConfirm() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+      if (!document.getElementById('detailModal').classList.contains('open')) {
+        document.body.style.overflow = '';
+      }
+    }
+
+    async function executeDelete() {
+      if (activeIndex === null) return;
+
+      const spinner = document.getElementById('deleteSpinner');
+      const btnText = document.getElementById('deleteBtnText');
+      const btn     = document.getElementById('confirmDeleteBtn');
+      btn.disabled  = true;
+      spinner.style.display = 'block';
+      btnText.textContent   = 'Deleting…';
+
+      try {
+        await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=deleteRequest&rowIndex=${activeIndex}`);
+        requestData.splice(activeIndex, 1);
+        activeIndex = null;
+        renderTable();
+        updateStats();
+        closeConfirm();
+        closeModal();
+        showToast('✓ Request deleted.', 'success');
+      } catch {
+        showToast('✕ Failed to delete. Try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent   = 'Delete';
+      }
+    }
+
+    // ── Toast ───────────────────────────────────────────────
     const showToast = (msg, type = 'success') => {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
-      toast.className = `show ${type}`;
+      toast.className   = `show ${type}`;
       setTimeout(() => { toast.className = ''; }, 4500);
     };
   </script>
