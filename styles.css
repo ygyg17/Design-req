@@ -23,12 +23,15 @@
   --gold-tint-hover: rgba(186, 143, 46, 0.16);
   --gold-shadow:     rgba(186, 143, 46, 0.28);
 
-  --success:         #16a34a;
-  --success-bg:      #dcfce7;
-  --error:           #dc2626;
-  --error-bg:        #fee2e2;
-  --warning:         #d97706;
-  --warning-bg:      #fef3c7;
+  --success:         #3a7d5a;
+  --success-bg:      #edf3ef;
+  --success-border:  #c4d9cc;
+  --error:           #a03030;
+  --error-bg:        #f5eded;
+  --error-border:    #dbbfbf;
+  --warning:         #7a6020;
+  --warning-bg:      #f5f0e8;
+  --warning-border:  #ddd0ae;
 
   --radius-sm:       8px;
   --radius:          12px;
@@ -399,13 +402,13 @@ button:disabled {
 
 .logout-btn {
   color: var(--error);
-  border-color: var(--error-bg);
+  border-color: var(--error-border);
   background: var(--error-bg);
 }
 
 .logout-btn:hover:not(:disabled) {
-  background: #fecaca;
-  border-color: #fca5a5;
+  background: #ede4e4;
+  border-color: #c9a8a8;
 }
 
 .btn-action {
@@ -575,9 +578,9 @@ footer a:hover { text-decoration: underline; }
   border: 1.5px solid;
 }
 
-.stat-pill--all     { background: var(--bg); border-color: var(--border); color: var(--text-muted); }
-.stat-pill--pending { background: var(--warning-bg); border-color: #fde68a; color: var(--warning); }
-.stat-pill--done    { background: var(--success-bg); border-color: #bbf7d0; color: var(--success); }
+.stat-pill--all     { background: var(--surface-raised); border-color: var(--border); color: var(--text-muted); }
+.stat-pill--pending { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning); }
+.stat-pill--done    { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
 
 .stat-num   { font-size: 16px; font-weight: 700; }
 .stat-label { font-size: 12px; font-weight: 500; opacity: 0.85; }
@@ -704,13 +707,13 @@ tbody tr:hover { background: var(--surface-raised); }
 .badge--pending {
   background: var(--warning-bg);
   color: var(--warning);
-  border-color: #fde68a;
+  border-color: var(--warning-border);
 }
 
 .badge--done {
   background: var(--success-bg);
   color: var(--success);
-  border-color: #bbf7d0;
+  border-color: var(--success-border);
 }
 
 /* ── Done Check ───────────────────────────────────────────── */
