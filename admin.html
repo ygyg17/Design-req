@@ -172,7 +172,7 @@
     .btn-delete {
       background: var(--error-bg);
       color: var(--error);
-      border: 1.5px solid #fca5a5;
+      border: 1.5px solid var(--error-border);
       box-shadow: none;
       font-size: 12.5px;
       font-weight: 600;
@@ -182,8 +182,8 @@
       margin-top: 0;
     }
     .btn-delete:hover:not(:disabled) {
-      background: #fecaca;
-      border-color: #f87171;
+      background: #ede4e4;
+      border-color: #c9a8a8;
       transform: none;
       box-shadow: none;
     }
@@ -199,7 +199,7 @@
       margin-top: 0;
     }
     .btn-danger:hover:not(:disabled) {
-      background: #b91c1c;
+      background: #8a2828;
       transform: none;
       box-shadow: none;
     }
@@ -390,7 +390,7 @@
   <script src="config.js"></script>
   <script>
     let requestData  = [];
-    let activeIndex  = null; // index in requestData of currently open modal
+    let activeIndex  = null;
 
     // ── Auth ────────────────────────────────────────────────
     function login() {
@@ -402,9 +402,8 @@
 
       if (user === 'marketing' && pass === '123') {
         errorEl.textContent = '';
-        document.getElementById('loginCard').style.display    = 'none';
-        document.getElementById('dashboardCard').style.display = 'block';
-        loadData();
+        sessionStorage.setItem('adminAuth', '1');
+        showDashboard();
       } else {
         errorEl.textContent = 'Incorrect username or password.';
         document.getElementById('password').value = '';
@@ -412,13 +411,23 @@
       }
     }
 
+    function showDashboard() {
+      document.getElementById('loginCard').style.display     = 'none';
+      document.getElementById('dashboardCard').style.display = 'block';
+      loadData();
+    }
+
     function logout() {
+      sessionStorage.removeItem('adminAuth');
       document.getElementById('dashboardCard').style.display = 'none';
       document.getElementById('loginCard').style.display     = 'block';
       document.getElementById('username').value = '';
       document.getElementById('password').value = '';
       requestData = [];
     }
+
+    // Cek session saat halaman dimuat
+    if (sessionStorage.getItem('adminAuth') === '1') showDashboard();
 
     ['username','password'].forEach(id => {
       document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
