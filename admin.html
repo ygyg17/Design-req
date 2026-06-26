@@ -124,6 +124,16 @@
 
     .modal-footer-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
+    /* ── Multiple file links ───────────────────────────────── */
+    .modal-file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .modal-file-list .file-link {
+      display: inline-flex;
+    }
+
     /* ── Confirm Dialog ────────────────────────────────────── */
     .confirm-overlay {
       display: none;
@@ -350,15 +360,15 @@
           <span class="modal-field-label">Design Brief &amp; Notes</span>
           <span class="modal-field-value" id="modalNotes">—</span>
         </div>
+        <div class="modal-field" id="modalFilesField" style="display:none;">
+          <span class="modal-field-label">Attached Files</span>
+          <div class="modal-file-list" id="modalFileList"></div>
+        </div>
       </div>
 
       <div class="modal-footer">
         <span id="modalStatus"></span>
         <div class="modal-footer-actions">
-          <a class="file-link" id="modalFileLink" href="#" target="_blank" rel="noopener" style="display:none;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            View File
-          </a>
           <button class="btn-action" id="modalMarkDoneBtn" onclick="markAsDoneFromModal()" style="display:none;">Mark as Done</button>
           <button class="btn-delete" id="modalDeleteBtn" onclick="confirmDelete()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -477,6 +487,15 @@
       return new Date(deadlineStr) < new Date();
     }
 
+    // Pecah isi kolom "File URL" jadi array link.
+    // Mendukung data lama (1 URL polos) maupun data baru (beberapa URL
+    // dipisah baris baru dari multi-file upload).
+    function getFileUrls(row) {
+      const raw = row['File URL'];
+      if (!raw) return [];
+      return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
+    }
+
     // ── Render ──────────────────────────────────────────────
     function renderTable() {
       const filter = document.getElementById('filterStatus').value;
@@ -576,13 +595,21 @@
       document.getElementById('modalStatus').innerHTML =
         `<span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span>`;
 
-      // file link
-      const fileLink = document.getElementById('modalFileLink');
-      if (row['File URL']) {
-        fileLink.href = row['File URL'];
-        fileLink.style.display = 'inline-flex';
+      // file links (mendukung 1 atau banyak file)
+      const fileUrls   = getFileUrls(row);
+      const filesField = document.getElementById('modalFilesField');
+      const fileListEl = document.getElementById('modalFileList');
+      if (fileUrls.length > 0) {
+        filesField.style.display = '';
+        fileListEl.innerHTML = fileUrls.map((url, i) => `
+          <a class="file-link" href="${url}" target="_blank" rel="noopener">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            ${fileUrls.length > 1 ? `View File ${i + 1}` : 'View File'}
+          </a>
+        `).join('');
       } else {
-        fileLink.style.display = 'none';
+        filesField.style.display = 'none';
+        fileListEl.innerHTML = '';
       }
 
       // mark done button
