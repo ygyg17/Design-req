@@ -2,146 +2,290 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Graphic Design Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — The Seminyak</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <header>
-    <div class="header-left">
-      <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak" style="width:40px;height:40px;object-fit:contain; border-radius:8px;">
+    <div class="header-content">
+      <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
       <div class="brand-block">
         <span class="brand-eyebrow">Marketing Team</span>
-        <span class="brand-name">Office Desk Admin</span>
+        <span class="brand-name">Admin Dashboard</span>
       </div>
     </div>
   </header>
 
-  <main class="admin-main">
-    <div class="card" id="loginCard" style="max-width: 400px; margin: 0 auto;">
-      <h3 style="margin-top: 0;">Admin Login</h3>
+  <main>
+
+    <!-- ── Login ─────────────────────────────────────────────── -->
+    <div class="card login-card" id="loginCard">
+      <div class="card-heading">
+        <h1 class="card-title">Admin Login</h1>
+        <p class="card-subtitle">Restricted to marketing team members only.</p>
+      </div>
+
       <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="username">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter username" autocomplete="username">
       </div>
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="password">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
       </div>
-      <button onclick="login()">Login</button>
+      <span class="field-error" id="loginError"></span>
+      <button onclick="login()" id="loginBtn">
+        <span class="spinner" id="loginSpinner" aria-hidden="true"></span>
+        <span id="loginBtnText">Log In</span>
+      </button>
     </div>
 
-    <div class="card" id="dashboardCard" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin: 0;">Design Requests</h3>
-        <select id="filterStatus" onchange="loadData()" style="width: 200px;">
-          <option value="All">All Categories</option>
-          <option value="Pending">Pending</option>
-          <option value="Done">Done</option>
-        </select>
+    <!-- ── Dashboard ──────────────────────────────────────────── -->
+    <div class="card dashboard-card" id="dashboardCard" style="display:none;">
+
+      <div class="dashboard-header">
+        <div>
+          <h2 class="dashboard-title">Design Requests</h2>
+          <p class="dashboard-subtitle" id="requestCount">Loading…</p>
+        </div>
+        <div class="dashboard-controls">
+          <div class="select-wrapper filter-select">
+            <select id="filterStatus" onchange="renderTable()">
+              <option value="All">All Requests</option>
+              <option value="Pending">Pending</option>
+              <option value="Done">Done</option>
+            </select>
+            <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <button class="btn-outline" onclick="loadData()" id="refreshBtn" title="Refresh">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+          <button class="btn-outline logout-btn" onclick="logout()">Log Out</button>
+        </div>
       </div>
-      
-      <div style="overflow-x: auto;">
+
+      <!-- Stats strip -->
+      <div class="stats-strip" id="statsStrip"></div>
+
+      <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Requester</th>
               <th>Department</th>
-              <th>Date Submit</th>
-              <th>Note</th>
+              <th>Submitted</th>
+              <th>Deadline</th>
+              <th>Brief</th>
               <th>File</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+            <tr><td colspan="8" class="table-state">Loading requests…</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
   </main>
+
+  <footer>
+    <span>&copy; 2026 The Seminyak Marketing Team</span>
+    <a href="index.html">Submit a Request</a>
+  </footer>
+
+  <div id="toast" role="alert" aria-live="assertive"></div>
 
   <script src="config.js"></script>
   <script>
     let requestData = [];
 
+    // ── Auth ──────────────────────────────────────────────────────────
     function login() {
-      const user = document.getElementById('username').value;
+      const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value;
+      const errorEl = document.getElementById('loginError');
+
+      if (!user || !pass) {
+        errorEl.textContent = 'Please enter both username and password.';
+        return;
+      }
+
       if (user === 'marketing' && pass === '123') {
+        errorEl.textContent = '';
         document.getElementById('loginCard').style.display = 'none';
         document.getElementById('dashboardCard').style.display = 'block';
         loadData();
       } else {
-        alert('Invalid credentials');
+        errorEl.textContent = 'Incorrect username or password.';
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
       }
     }
 
+    function logout() {
+      document.getElementById('dashboardCard').style.display = 'none';
+      document.getElementById('loginCard').style.display = 'block';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      requestData = [];
+    }
+
+    // Allow Enter key on login fields
+    ['username','password'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') login();
+      });
+    });
+
+    // ── Data ──────────────────────────────────────────────────────────
     async function loadData() {
       const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = `<tr><td colspan="8" class="table-state">
+        <span class="loading-dots"><span></span><span></span><span></span></span>
+        Fetching requests…
+      </td></tr>`;
+
       try {
-        const response = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getRequests`);
-        requestData = await response.json();
+        const res = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getRequests`);
+        requestData = await res.json();
         renderTable();
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--color-error)">Failed to load data</td></tr>`;
+        updateStats();
+      } catch {
+        tbody.innerHTML = `<tr><td colspan="8" class="table-state table-state--error">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Failed to load data. Check your connection and
+          <button class="link-btn" onclick="loadData()">try again</button>.
+        </td></tr>`;
       }
+    }
+
+    function updateStats() {
+      const total   = requestData.length;
+      const pending = requestData.filter(r => r.Status === 'Pending').length;
+      const done    = requestData.filter(r => r.Status === 'Done').length;
+
+      document.getElementById('requestCount').textContent =
+        `${total} total request${total !== 1 ? 's' : ''}`;
+
+      document.getElementById('statsStrip').innerHTML = `
+        <div class="stat-pill stat-pill--all">
+          <span class="stat-num">${total}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-pill stat-pill--pending">
+          <span class="stat-num">${pending}</span>
+          <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat-pill stat-pill--done">
+          <span class="stat-num">${done}</span>
+          <span class="stat-label">Done</span>
+        </div>
+      `;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function truncate(str, n = 80) {
+      return str && str.length > n ? str.slice(0, n) + '…' : (str || '—');
     }
 
     function renderTable() {
       const filter = document.getElementById('filterStatus').value;
-      const tbody = document.getElementById('tableBody');
+      const tbody  = document.getElementById('tableBody');
       tbody.innerHTML = '';
 
-      const filtered = filter === 'All' ? requestData : requestData.filter(r => r.Status === filter);
+      const rows = filter === 'All'
+        ? requestData
+        : requestData.filter(r => r.Status === filter);
 
-      if(filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No requests found.</td></tr>`;
+      if (rows.length === 0) {
+        const label = filter === 'All' ? 'No requests yet.' : `No ${filter.toLowerCase()} requests.`;
+        tbody.innerHTML = `<tr><td colspan="8" class="table-state">${label}</td></tr>`;
         return;
       }
 
-      filtered.forEach((row, index) => {
-        const tr = document.createElement('tr');
-        const badgeClass = row.Status === 'Pending' ? 'pending' : 'done';
-        
-        // Memastikan parameter action muncul jika statusnya masih Pending
-        const actionBtn = row.Status === 'Pending' 
-          ? `<button class="btn-small" onclick="markAsDone(${index})">Mark as Done</button>` 
-          : `-`;
+      rows.forEach((row) => {
+        const actualIndex = requestData.indexOf(row);
+        const isPending   = row.Status === 'Pending';
 
+        const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${row.Name}</td>
-          <td>${row.Department}</td>
-          <td>${row['Date Submit']}</td>
-          <td>${row.Notes}</td>
-          <td><a href="${row['File URL']}" target="_blank" style="color:var(--color-brand)">View File</a></td>
-          <td><span class="badge ${badgeClass}">${row.Status}</span></td>
-          <td>${actionBtn}</td>
+          <td>
+            <div class="requester-cell">
+              <span class="requester-name">${row.Name || '—'}</span>
+              <span class="requester-email">${row.Email || ''}</span>
+            </div>
+          </td>
+          <td>${row.Department || '—'}</td>
+          <td class="date-cell">${formatDate(row['Date Submit'])}</td>
+          <td class="date-cell ${isOverdue(row.Deadline, isPending) ? 'overdue' : ''}">${formatDate(row.Deadline)}</td>
+          <td>
+            <span class="note-text" title="${(row.Notes || '').replace(/"/g, '&quot;')}">${truncate(row.Notes)}</span>
+          </td>
+          <td>
+            ${row['File URL']
+              ? `<a class="file-link" href="${row['File URL']}" target="_blank" rel="noopener">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  View
+                </a>`
+              : '—'}
+          </td>
+          <td><span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span></td>
+          <td>
+            ${isPending
+              ? `<button class="btn-action" onclick="markAsDone(${actualIndex})">Mark Done</button>`
+              : `<span class="done-check">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Complete
+                </span>`}
+          </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    async function markAsDone(rowIndex) {
-      // Temukan indeks asli berdasarkan data utuh, bukan data yg difilter
-      const filter = document.getElementById('filterStatus').value;
-      let actualIndex = rowIndex;
-      
-      if (filter !== 'All') {
-        const filtered = requestData.filter(r => r.Status === filter);
-        const item = filtered[rowIndex];
-        actualIndex = requestData.findIndex(r => r === item);
-      }
+    function isOverdue(deadlineStr, isPending) {
+      if (!deadlineStr || !isPending) return false;
+      return new Date(deadlineStr) < new Date();
+    }
+
+    async function markAsDone(index) {
+      const btn = document.querySelector(`button[onclick="markAsDone(${index})"]`);
+      if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
 
       try {
-        await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=markDone&rowIndex=${actualIndex}`);
-        requestData[actualIndex].Status = 'Done'; // Update lokal
-        renderTable(); // Render ulang
-      } catch (err) {
-        alert('Failed to update status');
+        await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=markDone&rowIndex=${index}`);
+        requestData[index].Status = 'Done';
+        renderTable();
+        updateStats();
+        showToast('✓ Request marked as done.', 'success');
+      } catch {
+        if (btn) { btn.disabled = false; btn.textContent = 'Mark Done'; }
+        showToast('✕ Failed to update status. Try again.', 'error');
       }
     }
+
+    // ── Toast ─────────────────────────────────────────────────────────
+    const showToast = (msg, type = 'success') => {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = `show ${type}`;
+      setTimeout(() => { toast.className = ''; }, 4500);
+    };
   </script>
 </body>
 </html>
