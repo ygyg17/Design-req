@@ -629,6 +629,21 @@ tbody tr:hover { background: var(--surface-raised); }
 
 .table-state--error { color: var(--error); }
 
+.table-hint {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin-bottom: 10px;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.action-cell { white-space: nowrap; }
+
 /* ── Requester Cell ───────────────────────────────────────── */
 .requester-cell {
   display: flex;
