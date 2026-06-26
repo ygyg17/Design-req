@@ -69,26 +69,67 @@
 </head>
 <body>
 
-  <header>
+  <nav class="topbar">
 
-    <div class="header-content">
+    <img class="topbar-logo"
 
-        <div class="header-left">
+         src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png"
 
-            <img
-                src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png"
-                alt="The Seminyak">
+         alt="The Seminyak">
 
-            <div class="brand-block">
-                <div class="brand-eyebrow">Marketing Team</div>
-                <div class="brand-name">Office Desk</div>
-            </div>
+    <div class="topbar-div"></div>
 
-        </div>
+    <span class="topbar-title">
 
-    </div>
+        Office Desk
 
-</header>
+    </span>
+
+    <div class="topbar-clock" id="mastClock">—</div>
+
+</nav>
+
+<script>
+
+(() => {
+
+    const clock = document.getElementById("mastClock");
+
+    if (!clock) return;
+
+    function updateClock() {
+
+        const now = new Date();
+
+        const date = now.toLocaleDateString("id-ID", {
+
+            day: "2-digit",
+
+            month: "short",
+
+            year: "numeric"
+
+        });
+
+        const time = now.toLocaleTimeString("id-ID", {
+
+            hour: "2-digit",
+
+            minute: "2-digit"
+
+        });
+
+        clock.innerHTML = `${date}&nbsp;&nbsp;<b>${time}</b>`;
+
+    }
+
+    updateClock();
+
+    setInterval(updateClock, 60000);
+
+})();
+
+</script>
 
   <main>
     <div class="card">
