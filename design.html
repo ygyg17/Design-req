@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* ── File list (multi-file) ───────────────────────────────────── */
     .file-list {
       display: flex;
       flex-direction: column;
@@ -66,7 +65,6 @@
       box-shadow: none;
     }
 
-    /* ── Upload progress overlay ──────────────────────────────────── */
     .upload-progress-wrap {
       display: none;
       flex-direction: column;
@@ -170,13 +168,6 @@
           <label>Supporting File(s) <span class="req" aria-hidden="true">*</span></label>
           <p class="field-hint">Any file type accepted. You can upload multiple files at once.</p>
 
-          <!--
-            FIX #1 & #2 (Desktop double-dialog + Mobile):
-            Input file dipindahkan ke LUAR dropArea agar tidak ada
-            click event yang bubble up dari input ke dropArea.
-            Input disembunyikan via CSS (bukan display:none agar tetap
-            accessible di mobile) dan dipicu secara programatik.
-          -->
           <input
             type="file"
             id="file"
@@ -204,7 +195,6 @@
           <span class="field-error" id="notesError"></span>
         </div>
 
-        <!-- FIX #3: Upload progress bar (hidden by default) -->
         <div class="upload-progress-wrap" id="uploadProgressWrap">
           <div class="upload-progress-label">
             <span id="uploadProgressText">Uploading files…</span>
@@ -233,7 +223,6 @@
 
   <script src="config.js"></script>
   <script>
-    // ── File upload feedback (multi-file) ──────────────────────────────
     const fileInput   = document.getElementById('file');
     const fileMsg     = document.getElementById('fileMsg');
     const dropArea    = document.getElementById('dropArea');
@@ -288,24 +277,18 @@
       renderFileList();
     }
 
-    // Delegasi klik tombol hapus di file list
     fileListEl.addEventListener('click', e => {
       const btn = e.target.closest('[data-remove-index]');
       if (!btn) return;
       removeFileAt(parseInt(btn.dataset.removeIndex, 10));
     });
 
-    // FIX #1 & #2: fileInput sekarang di luar dropArea.
-    // dropArea.click() hanya memanggil fileInput.click() — tidak ada
-    // bubbling balik ke dropArea karena keduanya sudah terpisah di DOM.
     fileInput.addEventListener('change', e => {
       addFiles(e.target.files);
-      // Reset value agar user bisa pilih file yang sama lagi bila perlu
       fileInput.value = '';
     });
 
     dropArea.addEventListener('click', e => {
-      // Jangan buka dialog jika yang diklik adalah tombol hapus
       if (e.target.closest('.file-list-item-remove')) return;
       fileInput.click();
     });
@@ -327,7 +310,6 @@
       }
     });
 
-    // ── Toast ─────────────────────────────────────────────────────────
     const showToast = (msg, type = 'success') => {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -335,7 +317,6 @@
       setTimeout(() => { toast.className = ''; }, 4500);
     };
 
-    // ── Inline validation helpers ─────────────────────────────────────
     const setError   = (id, msg) => { document.getElementById(id + 'Error').textContent = msg; };
     const clearError = id        => { document.getElementById(id + 'Error').textContent = ''; };
 
@@ -364,7 +345,6 @@
       return ok;
     }
 
-    // ── Helper: baca 1 file jadi base64 dengan progress tracking ───────
     function readFileAsBase64(file, onProgress) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -383,7 +363,6 @@
       });
     }
 
-    // ── Progress UI helpers ───────────────────────────────────────────
     const progressWrap = document.getElementById('uploadProgressWrap');
     const progressBar  = document.getElementById('uploadProgressBar');
     const progressPct  = document.getElementById('uploadProgressPct');
@@ -403,7 +382,6 @@
       progressPct.textContent = '0%';
     }
 
-    // ── Form submit ───────────────────────────────────────────────────
     document.getElementById('designForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (!validate()) return;
@@ -417,7 +395,6 @@
       spinner.style.display = 'block';
 
       try {
-        // FIX #3: Baca file satu per satu dengan progress per file
         const files = [];
         for (let i = 0; i < selectedFiles.length; i++) {
           const f     = selectedFiles[i];
@@ -435,7 +412,6 @@
           files.push(result);
         }
 
-        // Setelah semua file terbaca, tampilkan "Sending…"
         showProgress('Sending to server…', 1);
 
         const payload = {
