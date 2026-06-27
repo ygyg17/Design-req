@@ -651,14 +651,12 @@
         });
     }
 
-    // ── LOAD CATEGORIES UNTUK ADMIN ──
     function loadAdminCategories() {
       fetch(`${window.API_URL}?action=getCategories`)
         .then(res => res.json())
         .then(categories => {
           const categoryList = Array.isArray(categories) ? categories : ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
 
-          // 1. Update Dropdown Form
           const select = document.getElementById('inputCategory');
           const currentVal = select.value;
           
@@ -672,7 +670,6 @@
           
           if (currentVal) select.value = currentVal;
 
-          // 2. Update Filter Bar di Admin Panel
           const filterBar = document.querySelector('.filter-bar');
           if (filterBar) {
             filterBar.querySelectorAll('.tab-btn:not([data-cat="All"])').forEach(btn => btn.remove());
@@ -692,7 +689,6 @@
         });
     }
 
-    // ── TAMBAH KATEGORI BARU ──
     function addNewCategory() {
       const newCat = prompt("Masukkan nama kategori baru:");
       if (!newCat || newCat.trim() === '') return;
@@ -709,13 +705,11 @@
       }
 
       if (!exists) {
-        // Tambahkan opsi baru ke dropdown select
         const option = document.createElement('option');
         option.value = catName;
         option.textContent = catName;
         select.appendChild(option);
 
-        // Tambahkan tombol tab baru ke filter bar admin
         const filterBar = document.querySelector('.filter-bar');
         if (filterBar) {
           const btn = document.createElement('button');
