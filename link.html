@@ -421,7 +421,6 @@
         });
     }
 
-    // ── LOAD CATEGORIES (Aman dengan Cadangan Otomatis) ──
     function loadCategories() {
       fetch(`${window.API_URL}?action=getCategories`)
         .then(res => res.json())
@@ -429,13 +428,10 @@
           const filterBar = document.getElementById('filterBar');
           const searchBox = filterBar.querySelector('.search-box');
           
-          // Jika API mengembalikan data yang bukan array (misal error), gunakan cadangan
           const categoryList = Array.isArray(categories) ? categories : ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
           
-          // Bersihkan tombol filter lama selain tombol 'All'
           filterBar.querySelectorAll('.tab-btn:not([data-cat="All"])').forEach(btn => btn.remove());
           
-          // Gambar ulang tombol filter secara dinamis
           categoryList.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = 'tab-btn';
@@ -443,14 +439,12 @@
             btn.onclick = function() { filterLinks(cat); };
             btn.textContent = cat;
             
-            // Selipkan sebelum kotak pencarian
             filterBar.insertBefore(btn, searchBox);
           });
         })
         .catch(err => {
           console.error('API belum siap atau error, menggunakan filter bawaan:', err);
           
-          // Tampilkan filter cadangan jika koneksi ke Google Sheets gagal
           const filterBar = document.getElementById('filterBar');
           const searchBox = filterBar.querySelector('.search-box');
           const defaultCats = ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
