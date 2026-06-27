@@ -487,9 +487,6 @@
       return new Date(deadlineStr) < new Date();
     }
 
-    // Pecah isi kolom "File URL" jadi array link.
-    // Mendukung data lama (1 URL polos) maupun data baru (beberapa URL
-    // dipisah baris baru dari multi-file upload).
     function getFileUrls(row) {
       const raw = row['File URL'];
       if (!raw) return [];
@@ -543,7 +540,6 @@
           </td>
         `;
 
-        // clicking anywhere on the row (outside action-cell) opens modal
         tr.addEventListener('click', e => {
           if (!e.target.closest('.action-cell')) openModal(idx);
         });
@@ -552,7 +548,6 @@
       });
     }
 
-    // ── Mark Done ───────────────────────────────────────────
     async function markAsDone(index) {
       const btns = document.querySelectorAll(`button[onclick*="markAsDone(${index})"]`);
       btns.forEach(b => { b.disabled = true; b.textContent = 'Updating…'; });
@@ -563,7 +558,6 @@
         renderTable();
         updateStats();
         showToast('✓ Request marked as done.', 'success');
-        // refresh modal if it's open for this row
         if (activeIndex === index) openModal(index);
       } catch {
         btns.forEach(b => { b.disabled = false; b.textContent = 'Mark Done'; });
@@ -576,7 +570,6 @@
       await markAsDone(activeIndex);
     }
 
-    // ── Detail Modal ────────────────────────────────────────
     function openModal(index) {
       const row       = requestData[index];
       if (!row) return;
@@ -591,11 +584,9 @@
       document.getElementById('modalDeadline').textContent  = formatDate(row.Deadline) + (isOverdue(row.Deadline, isPending) ? ' ⚠ Overdue' : '');
       document.getElementById('modalNotes').textContent     = row.Notes || '—';
 
-      // status badge
       document.getElementById('modalStatus').innerHTML =
         `<span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span>`;
 
-      // file links (mendukung 1 atau banyak file)
       const fileUrls   = getFileUrls(row);
       const filesField = document.getElementById('modalFilesField');
       const fileListEl = document.getElementById('modalFileList');
@@ -612,7 +603,6 @@
         fileListEl.innerHTML = '';
       }
 
-      // mark done button
       document.getElementById('modalMarkDoneBtn').style.display = isPending ? 'inline-flex' : 'none';
 
       document.getElementById('detailModal').classList.add('open');
@@ -632,7 +622,6 @@
       if (e.key === 'Escape') { closeModal(); closeConfirm(); }
     });
 
-    // ── Delete ──────────────────────────────────────────────
     function openDeleteConfirm(index) {
       activeIndex = index;
       document.getElementById('confirmOverlay').classList.add('open');
@@ -640,7 +629,6 @@
     }
 
     function confirmDelete() {
-      // called from inside modal
       document.getElementById('confirmOverlay').classList.add('open');
     }
 
@@ -679,7 +667,6 @@
       }
     }
 
-    // ── Toast ───────────────────────────────────────────────
     const showToast = (msg, type = 'success') => {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
