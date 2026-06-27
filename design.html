@@ -65,6 +65,35 @@
       transform: none;
       box-shadow: none;
     }
+
+    /* ── Upload progress overlay ──────────────────────────────────── */
+    .upload-progress-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .upload-progress-wrap.visible { display: flex; }
+    .upload-progress-label {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .upload-progress-bar-track {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .upload-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent, #4f6ef7);
+      border-radius: 99px;
+      transition: width 0.25s ease;
+    }
   </style>
 </head>
 <body>
@@ -140,14 +169,31 @@
         <div class="form-group">
           <label>Supporting File(s) <span class="req" aria-hidden="true">*</span></label>
           <p class="field-hint">Any file type accepted. You can upload multiple files at once.</p>
+
+          <!--
+            FIX #1 & #2 (Desktop double-dialog + Mobile):
+            Input file dipindahkan ke LUAR dropArea agar tidak ada
+            click event yang bubble up dari input ke dropArea.
+            Input disembunyikan via CSS (bukan display:none agar tetap
+            accessible di mobile) dan dipicu secara programatik.
+          -->
+          <input
+            type="file"
+            id="file"
+            name="file"
+            multiple
+            aria-label="Upload files"
+            style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden;"
+          >
+
           <div class="file-drop-area" id="dropArea" role="button" tabindex="0" aria-label="Upload supporting files">
             <div class="file-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
             <span class="file-msg" id="fileMsg">Click or drag file(s) here</span>
             <span class="file-submsg">Any file type · multiple files allowed</span>
-            <input type="file" id="file" name="file" multiple aria-label="Upload files">
           </div>
+
           <div class="file-list" id="fileList"></div>
           <span class="field-error" id="fileError"></span>
         </div>
@@ -156,6 +202,17 @@
           <label for="notes">Design Brief &amp; Notes <span class="req" aria-hidden="true">*</span></label>
           <textarea id="notes" name="notes" placeholder="Describe your request in detail — include dimensions, tone, target audience, and any references…" required></textarea>
           <span class="field-error" id="notesError"></span>
+        </div>
+
+        <!-- FIX #3: Upload progress bar (hidden by default) -->
+        <div class="upload-progress-wrap" id="uploadProgressWrap">
+          <div class="upload-progress-label">
+            <span id="uploadProgressText">Uploading files…</span>
+            <span id="uploadProgressPct">0%</span>
+          </div>
+          <div class="upload-progress-bar-track">
+            <div class="upload-progress-bar-fill" id="uploadProgressBar"></div>
+          </div>
         </div>
 
         <button type="submit" id="submitBtn">
@@ -177,14 +234,11 @@
   <script src="config.js"></script>
   <script>
     // ── File upload feedback (multi-file) ──────────────────────────────
-    const fileInput = document.getElementById('file');
-    const fileMsg   = document.getElementById('fileMsg');
-    const dropArea  = document.getElementById('dropArea');
-    const fileListEl = document.getElementById('fileList');
+    const fileInput   = document.getElementById('file');
+    const fileMsg     = document.getElementById('fileMsg');
+    const dropArea    = document.getElementById('dropArea');
+    const fileListEl  = document.getElementById('fileList');
 
-    // Menyimpan file terpilih secara independen dari fileInput.files,
-    // supaya kita bisa gabungkan file dari beberapa kali pilih/drag dan
-    // menghapus satu per satu.
     let selectedFiles = [];
 
     function formatFileSize(bytes) {
@@ -221,9 +275,8 @@
     }
 
     function addFiles(fileListInput) {
-      if (!fileListInput) return;
+      if (!fileListInput || fileListInput.length === 0) return;
       Array.from(fileListInput).forEach(f => {
-        // Hindari duplikat nama+ukuran kalau user pilih file yang sama dua kali
         const dup = selectedFiles.some(sf => sf.name === f.name && sf.size === f.size);
         if (!dup) selectedFiles.push(f);
       });
@@ -235,30 +288,44 @@
       renderFileList();
     }
 
+    // Delegasi klik tombol hapus di file list
     fileListEl.addEventListener('click', e => {
       const btn = e.target.closest('[data-remove-index]');
       if (!btn) return;
       removeFileAt(parseInt(btn.dataset.removeIndex, 10));
     });
 
+    // FIX #1 & #2: fileInput sekarang di luar dropArea.
+    // dropArea.click() hanya memanggil fileInput.click() — tidak ada
+    // bubbling balik ke dropArea karena keduanya sudah terpisah di DOM.
     fileInput.addEventListener('change', e => {
       addFiles(e.target.files);
-      fileInput.value = ''; // reset agar bisa pilih ulang file yang sama bila perlu
+      // Reset value agar user bisa pilih file yang sama lagi bila perlu
+      fileInput.value = '';
     });
 
     dropArea.addEventListener('click', e => {
+      // Jangan buka dialog jika yang diklik adalah tombol hapus
       if (e.target.closest('.file-list-item-remove')) return;
       fileInput.click();
     });
 
-    dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+    dropArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropArea.classList.add('dragover');
+    });
     dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
     dropArea.addEventListener('drop', e => {
       e.preventDefault();
       dropArea.classList.remove('dragover');
       addFiles(e.dataTransfer.files);
     });
-    dropArea.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+    dropArea.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
 
     // ── Toast ─────────────────────────────────────────────────────────
     const showToast = (msg, type = 'success') => {
@@ -269,8 +336,8 @@
     };
 
     // ── Inline validation helpers ─────────────────────────────────────
-    const setError = (id, msg) => { document.getElementById(id + 'Error').textContent = msg; };
-    const clearError = id => { document.getElementById(id + 'Error').textContent = ''; };
+    const setError   = (id, msg) => { document.getElementById(id + 'Error').textContent = msg; };
+    const clearError = id        => { document.getElementById(id + 'Error').textContent = ''; };
 
     ['email','name','department','deadline','notes'].forEach(id => {
       const el = document.getElementById(id);
@@ -297,18 +364,43 @@
       return ok;
     }
 
-    // ── Helper: baca 1 file jadi base64 (Promise) ──────────────────────
-    function readFileAsBase64(file) {
+    // ── Helper: baca 1 file jadi base64 dengan progress tracking ───────
+    function readFileAsBase64(file, onProgress) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload  = () => resolve({
-          fileName: file.name,
-          mimeType: file.type || 'application/octet-stream',
+        reader.onprogress = e => {
+          if (e.lengthComputable && onProgress) {
+            onProgress(e.loaded / e.total);
+          }
+        };
+        reader.onload = () => resolve({
+          fileName:   file.name,
+          mimeType:   file.type || 'application/octet-stream',
           fileBase64: reader.result.split(',')[1]
         });
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(file);
       });
+    }
+
+    // ── Progress UI helpers ───────────────────────────────────────────
+    const progressWrap = document.getElementById('uploadProgressWrap');
+    const progressBar  = document.getElementById('uploadProgressBar');
+    const progressPct  = document.getElementById('uploadProgressPct');
+    const progressText = document.getElementById('uploadProgressText');
+
+    function showProgress(label, pct) {
+      progressWrap.classList.add('visible');
+      progressText.textContent = label;
+      const p = Math.round(pct * 100);
+      progressBar.style.width  = p + '%';
+      progressPct.textContent  = p + '%';
+    }
+
+    function hideProgress() {
+      progressWrap.classList.remove('visible');
+      progressBar.style.width = '0%';
+      progressPct.textContent = '0%';
     }
 
     // ── Form submit ───────────────────────────────────────────────────
@@ -320,12 +412,31 @@
       const btnText = document.getElementById('btnText');
       const spinner = document.getElementById('btnSpinner');
 
-      btn.disabled = true;
-      btnText.textContent = 'Submitting…';
+      btn.disabled          = true;
+      btnText.textContent   = 'Submitting…';
       spinner.style.display = 'block';
 
       try {
-        const files = await Promise.all(selectedFiles.map(readFileAsBase64));
+        // FIX #3: Baca file satu per satu dengan progress per file
+        const files = [];
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const f     = selectedFiles[i];
+          const label = selectedFiles.length === 1
+            ? `Reading file…`
+            : `Reading file ${i + 1} of ${selectedFiles.length}…`;
+
+          showProgress(label, 0);
+
+          const result = await readFileAsBase64(f, ratio => {
+            // Progress untuk file saat ini (porsi dari keseluruhan)
+            const overall = (i + ratio) / selectedFiles.length;
+            showProgress(label, overall);
+          });
+          files.push(result);
+        }
+
+        // Setelah semua file terbaca, tampilkan "Sending…"
+        showProgress('Sending to server…', 1);
 
         const payload = {
           email:      document.getElementById('email').value.trim(),
@@ -333,21 +444,23 @@
           department: document.getElementById('department').value,
           deadline:   document.getElementById('deadline').value,
           notes:      document.getElementById('notes').value.trim(),
-          files:      files // array of { fileName, mimeType, fileBase64 }
+          files
         };
 
         await fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
 
+        hideProgress();
         showToast('✓ Request submitted successfully!', 'success');
         document.getElementById('designForm').reset();
         selectedFiles = [];
         renderFileList();
 
       } catch (err) {
+        hideProgress();
         showToast('✕ Submission failed. Check your connection and try again.', 'error');
       } finally {
-        btn.disabled = false;
-        btnText.textContent = 'Submit Request';
+        btn.disabled          = false;
+        btnText.textContent   = 'Submit Request';
         spinner.style.display = 'none';
       }
     });
