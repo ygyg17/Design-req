@@ -3,250 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — The Seminyak</title>
+  <title>Unified Admin Hub — The Seminyak</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
-
-  <style>
-    /* ── Modal Overlay ─────────────────────────────────────── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      background: var(--surface);
-      border-radius: 18px;
-      width: 100%;
-      max-width: 560px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
-      animation: modal-in 0.2s ease;
-    }
-    @keyframes modal-in {
-      from { opacity: 0; transform: translateY(10px) scale(0.98); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 24px 28px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-header-info { flex: 1; min-width: 0; }
-    .modal-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 3px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .modal-meta {
-      font-size: 12.5px;
-      color: var(--text-muted);
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      box-shadow: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 6px;
-      width: auto;
-      margin: 0;
-      flex-shrink: 0;
-      transition: color var(--transition), background var(--transition);
-    }
-    .modal-close:hover:not(:disabled) {
-      background: var(--surface-raised);
-      color: var(--text);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .modal-body {
-      padding: 24px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .modal-field { display: flex; flex-direction: column; gap: 5px; }
-    .modal-field-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-    }
-    .modal-field-value {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .modal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px 24px;
-    }
-
-    .modal-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 28px 24px;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-
-    .modal-footer-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-    /* ── Multiple file links ───────────────────────────────── */
-    .modal-file-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .modal-file-list .file-link {
-      display: inline-flex;
-    }
-
-    /* ── Confirm Dialog ────────────────────────────────────── */
-    .confirm-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 600;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .confirm-overlay.open { display: flex; }
-
-    .confirm-box {
-      background: var(--surface);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 400px;
-      padding: 28px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
-      animation: modal-in 0.15s ease;
-    }
-    .confirm-icon {
-      width: 44px; height: 44px;
-      background: var(--error-bg);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
-      color: var(--error);
-    }
-    .confirm-title {
-      font-size: 16px; font-weight: 600;
-      color: var(--text); margin-bottom: 6px;
-    }
-    .confirm-desc {
-      font-size: 13.5px; color: var(--text-muted);
-      line-height: 1.55; margin-bottom: 24px;
-    }
-    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
-    /* ── Row clickable ─────────────────────────────────────── */
-    tbody tr { cursor: pointer; }
-    tbody tr td.action-cell { cursor: default; }
-
-    /* ── Delete btn ────────────────────────────────────────── */
-    .btn-delete {
-      background: var(--error-bg);
-      color: var(--error);
-      border: 1.5px solid var(--error-border);
-      box-shadow: none;
-      font-size: 12.5px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      width: auto;
-      margin-top: 0;
-    }
-    .btn-delete:hover:not(:disabled) {
-      background: #ede4e4;
-      border-color: #c9a8a8;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-danger {
-      background: var(--error);
-      color: #fff;
-      border: none;
-      box-shadow: none;
-      font-size: 14px;
-      padding: 10px 18px;
-      width: auto;
-      margin-top: 0;
-    }
-    .btn-danger:hover:not(:disabled) {
-      background: #8a2828;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-cancel {
-      background: var(--surface-raised);
-      color: var(--text-muted);
-      border: 1.5px solid var(--border);
-      box-shadow: none;
-      font-size: 14px;
-      padding: 10px 18px;
-      width: auto;
-      margin-top: 0;
-    }
-    .btn-cancel:hover:not(:disabled) {
-      background: var(--border);
-      color: var(--text);
-      transform: none;
-      box-shadow: none;
-    }
-  </style>
 </head>
 <body>
 
   <header>
-    <div class="header-content">
-      <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
-      <div class="brand-block">
-        <span class="brand-eyebrow">Marketing Team</span>
-        <span class="brand-name">Admin Dashboard</span>
+    <div class="header-content" style="justify-content: space-between; width: 100%; max-width: 1040px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
+        <div class="brand-block">
+          <span class="brand-eyebrow">Marketing Team</span>
+          <span class="brand-name">Unified Admin Hub</span>
+        </div>
+      </div>
+      <div style="text-align: right; line-height: 1.4; display: flex; flex-direction: column; justify-content: center;">
+        <span id="clock-date" style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">—</span>
+        <span id="clock-time" style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--gold);">--:--</span>
       </div>
     </div>
   </header>
 
-  <main>
+  <main style="padding-top: 32px;">
 
-    <!-- ── Login ──────────────────────────────────────────── -->
     <div class="card login-card" id="loginCard">
       <div class="card-heading">
         <h1 class="card-title">Admin Login</h1>
@@ -267,110 +52,165 @@
       </button>
     </div>
 
-    <!-- ── Dashboard ──────────────────────────────────────── -->
-    <div class="card dashboard-card" id="dashboardCard" style="display:none;">
+    <div class="card dashboard-card" id="dashboardCard" style="display:none; max-width: 1040px; width: 100%;">
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 16px; flex-wrap: wrap;">
+        <button id="tabBtnDesign" class="btn-outline" onclick="switchTab('design')" style="background: var(--gold); color: #fff; border-color: var(--gold);">Design Requests</button>
+        <button id="tabBtnLink" class="btn-outline" onclick="switchTab('link')">Link Bank</button>
+        <button class="btn-outline logout-btn" onclick="logout()" style="margin-left: auto;">Log Out</button>
+      </div>
 
-      <div class="dashboard-header">
-        <div>
-          <h2 class="dashboard-title">Design Requests</h2>
-          <p class="dashboard-subtitle" id="requestCount">Loading…</p>
-        </div>
-        <div class="dashboard-controls">
-          <div class="select-wrapper filter-select">
-            <select id="filterStatus" onchange="renderTable()">
-              <option value="All">All Requests</option>
-              <option value="Pending">Pending</option>
-              <option value="Done">Done</option>
-            </select>
-            <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      <div id="viewDesignRequests">
+        <div class="dashboard-header">
+          <div>
+            <h2 class="dashboard-title">Design Requests</h2>
+            <p class="dashboard-subtitle" id="requestCount">Loading…</p>
           </div>
-          <button class="btn-outline" onclick="loadData()" title="Refresh">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
-          <button class="btn-outline logout-btn" onclick="logout()">Log Out</button>
+          <div class="dashboard-controls">
+            <div class="select-wrapper filter-select">
+              <select id="filterStatus" onchange="renderTable()">
+                <option value="All">All Requests</option>
+                <option value="Pending">Pending</option>
+                <option value="Done">Done</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <button class="btn-outline" onclick="loadData()" title="Refresh">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-strip" id="statsStrip"></div>
+        <p class="table-hint">Click any row to view full details.</p>
+
+        <div class="table-wrapper">
+          <table style="cursor: pointer;">
+            <thead>
+              <tr>
+                <th>Requester</th>
+                <th>Department</th>
+                <th>Submitted</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="6" class="table-state">Loading requests…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="stats-strip" id="statsStrip"></div>
+      <div id="viewLinkBank" style="display: none;">
+        
+        <div style="background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 28px;">
+          <h2 class="dashboard-title" id="formTitle" style="font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <span style="display: block; width: 4px; height: 16px; background: var(--gold); border-radius: 2px;"></span>
+            Add New Link
+          </h2>
+          <input type="hidden" id="editLinkId" value="">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputLinkName">Name <span class="req">*</span></label>
+              <input type="text" id="inputLinkName" placeholder="e.g., Menu Restaurant Bawah">
+            </div>
+            <div class="form-group">
+              <label for="inputLinkCat">Category <span class="req">*</span></label>
+              <div style="display: flex; gap: 8px;">
+                <div class="select-wrapper" style="flex: 1;">
+                  <select id="inputLinkCat">
+                    <option value="">— Select Category —</option>
+                  </select>
+                  <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <button class="btn-outline" onclick="addNewCategory()" style="padding: 0 14px; width: auto;">+ New</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="inputLinkUrl">URL Link <span class="req">*</span></label>
+            <input type="url" id="inputLinkUrl" placeholder="https://...">
+          </div>
+          
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button id="btnSubmitLink" onclick="submitLink()" style="width: auto; padding: 10px 24px; margin-top: 0;">Save Link</button>
+            <button id="btnCancelEdit" class="btn-outline" onclick="cancelEditLink()" style="display: none;">Cancel Edit</button>
+          </div>
+        </div>
 
-      <p class="table-hint">Click any row to view full details.</p>
+        <div class="dashboard-header" style="margin-bottom: 16px;">
+          <div>
+            <h2 class="dashboard-title">All Links</h2>
+            <p class="dashboard-subtitle" id="linkCountBadge">0 total links</p>
+          </div>
+        </div>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Requester</th>
-              <th>Department</th>
-              <th>Submitted</th>
-              <th>Deadline</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr><td colspan="6" class="table-state">Loading requests…</td></tr>
-          </tbody>
-        </table>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;" id="linkFilterBar">
+           </div>
+
+        <div class="table-wrapper">
+          <table style="cursor: default;">
+            <thead>
+              <tr>
+                <th>Link Name</th>
+                <th>Category</th>
+                <th>URL</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="linkTableBody">
+              <tr><td colspan="4" class="table-state">Loading links…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
+    </div>
   </main>
 
   <footer>
     <span>&copy; 2026 The Seminyak Marketing Team</span>
-    <a href="index.html">Submit a Request</a>
+    <a href="index.html">Submit a Design Request</a>
   </footer>
 
   <div id="toast" role="alert" aria-live="assertive"></div>
 
-  <!-- ── Detail Modal ──────────────────────────────────────── -->
-  <div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)">
-    <div class="modal" id="modalBox">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-title" id="modalName">—</div>
-          <div class="modal-meta" id="modalMeta">—</div>
+  <div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500; align-items:center; justify-content:center; padding:20px;">
+    <div class="modal" id="modalBox" style="background:var(--surface); border-radius:18px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+      <div class="modal-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:24px 28px 20px; border-bottom:1px solid var(--border);">
+        <div class="modal-header-info" style="flex:1; min-width:0;">
+          <div class="modal-title" id="modalName" style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+          <div class="modal-meta" id="modalMeta" style="font-size:12.5px; color:var(--text-muted);">—</div>
         </div>
-        <button class="modal-close" onclick="closeModal()" aria-label="Close">
+        <button class="btn-outline" onclick="closeModal()" style="padding:4px; border:none; box-shadow:none; border-radius:6px; cursor:pointer;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-
-      <div class="modal-body">
-        <div class="modal-grid">
-          <div class="modal-field">
-            <span class="modal-field-label">Email</span>
-            <span class="modal-field-value" id="modalEmail">—</span>
-          </div>
-          <div class="modal-field">
-            <span class="modal-field-label">Department</span>
-            <span class="modal-field-value" id="modalDept">—</span>
-          </div>
-          <div class="modal-field">
-            <span class="modal-field-label">Date Submitted</span>
-            <span class="modal-field-value" id="modalSubmitted">—</span>
-          </div>
-          <div class="modal-field">
-            <span class="modal-field-label">Deadline</span>
-            <span class="modal-field-value" id="modalDeadline">—</span>
-          </div>
+      <div class="modal-body" style="padding:24px 28px; display:flex; flex-direction:column; gap:20px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px 24px;">
+          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Email</span><span id="modalEmail" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
+          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Department</span><span id="modalDept" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
+          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Date Submitted</span><span id="modalSubmitted" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
+          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Deadline</span><span id="modalDeadline" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
         </div>
-        <div class="modal-field">
-          <span class="modal-field-label">Design Brief &amp; Notes</span>
-          <span class="modal-field-value" id="modalNotes">—</span>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Design Brief &amp; Notes</span>
+          <span id="modalNotes" style="font-size:14px; color:var(--text); line-height:1.6; white-space:pre-wrap; word-break:break-word;">—</span>
         </div>
-        <div class="modal-field" id="modalFilesField" style="display:none;">
-          <span class="modal-field-label">Attached Files</span>
-          <div class="modal-file-list" id="modalFileList"></div>
+        <div id="modalFilesField" style="display:none; flex-direction:column; gap:5px;">
+          <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Attached Files</span>
+          <div id="modalFileList" style="display:flex; flex-direction:column; gap:6px;"></div>
         </div>
       </div>
-
-      <div class="modal-footer">
+      <div class="modal-footer" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 28px 24px; border-top:1px solid var(--border); flex-wrap:wrap;">
         <span id="modalStatus"></span>
-        <div class="modal-footer-actions">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-action" id="modalMarkDoneBtn" onclick="markAsDoneFromModal()" style="display:none;">Mark as Done</button>
-          <button class="btn-delete" id="modalDeleteBtn" onclick="confirmDelete()">
+          <button class="btn-delete" id="modalDeleteBtn" onclick="openDeleteConfirm('design', activeIndex)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             Delete
           </button>
@@ -379,18 +219,17 @@
     </div>
   </div>
 
-  <!-- ── Confirm Delete Dialog ─────────────────────────────── -->
-  <div class="confirm-overlay" id="confirmOverlay">
-    <div class="confirm-box">
-      <div class="confirm-icon">
+  <div id="confirmOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:600; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--surface); border-radius:14px; width:100%; max-width:400px; padding:28px; box-shadow:0 24px 64px rgba(0,0,0,0.2);">
+      <div style="width:44px; height:44px; background:var(--error-bg); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:16px; color:var(--error);">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </div>
-      <div class="confirm-title">Delete this request?</div>
-      <p class="confirm-desc">This will permanently remove the request from the sheet. This action cannot be undone.</p>
-      <div class="confirm-actions">
-        <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
-        <button class="btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">
-          <span class="spinner" id="deleteSpinner" aria-hidden="true"></span>
+      <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:6px;">Delete this item?</div>
+      <p style="font-size:13.5px; color:var(--text-muted); line-height:1.55; margin-bottom:24px;">This will permanently remove the data. This action cannot be undone.</p>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn-outline" onclick="closeConfirm()" style="padding:10px 18px;">Cancel</button>
+        <button class="btn-delete" id="confirmDeleteBtn" onclick="executeDelete()" style="padding:10px 18px; background:var(--error); color:#fff; border:none;">
+          <span class="spinner" id="deleteSpinner" aria-hidden="true" style="border-top-color:#fff;"></span>
           <span id="deleteBtnText">Delete</span>
         </button>
       </div>
@@ -399,10 +238,47 @@
 
   <script src="config.js"></script>
   <script>
-    let requestData  = [];
-    let activeIndex  = null;
+    // ════════════════════════════════════════════════════════════
+    // GLOBAL STATE & UTILITIES
+    // ════════════════════════════════════════════════════════════
+    let requestData    = [];
+    let allLinks       = [];
+    let linkCategories = ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
+    
+    let activeTab      = 'design'; // 'design' or 'link'
+    let activeIndex    = null;     // Used for Design Requests
+    let deleteContext  = { type: null, id: null }; // Unified deletion context
 
-    // ── Auth ────────────────────────────────────────────────
+    // ── CLOCK ──
+    function updateClock() {
+      const now = new Date();
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('clock-date').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      document.getElementById('clock-time').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── TOAST ──
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className   = `show ${type}`;
+      setTimeout(() => { toast.className = ''; }, 3500);
+    }
+
+    // ── ESCAPE HELPERS ──
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function escAttr(str) { 
+      return String(str).replace(/'/g, "\\'"); 
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // AUTHENTICATION & NAVIGATION
+    // ════════════════════════════════════════════════════════════
     async function login() {
       const user    = document.getElementById('username').value.trim();
       const pass    = document.getElementById('password').value;
@@ -415,13 +291,17 @@
 
       btn.disabled          = true;
       spinner.style.display = 'block';
-      btnText.textContent   = 'Logging in…';
+      btnText.textContent   = 'Authenticating…';
 
       try {
-        const res  = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=verifyLogin&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`);
-        const data = await res.json();
+        // Authenticate concurrently for both backends (Design & Links)
+        const reqAuthPromise  = fetch(`${CONFIG.GAS_WEB_APP_URL}?action=verifyLogin&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`).then(r => r.json()).catch(() => ({ok: false}));
+        const linkAuthPromise = fetch(window.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'validateAdmin', username: user, password: pass }) }).then(r => r.json()).catch(() => ({success: false}));
 
-        if (data.ok) {
+        const [reqRes, linkRes] = await Promise.all([reqAuthPromise, linkAuthPromise]);
+
+        // Grant access if either authentication point succeeds
+        if (reqRes.ok || linkRes.success) {
           errorEl.textContent = '';
           sessionStorage.setItem('adminAuth', '1');
           showDashboard();
@@ -440,34 +320,51 @@
     }
 
     function showDashboard() {
-      document.getElementById('loginCard').style.display     = 'none';
+      document.getElementById('loginCard').style.display = 'none';
       document.getElementById('dashboardCard').style.display = 'block';
-      loadData();
+      switchTab('design'); // Default tab
     }
 
     function logout() {
       sessionStorage.removeItem('adminAuth');
       document.getElementById('dashboardCard').style.display = 'none';
-      document.getElementById('loginCard').style.display     = 'block';
+      document.getElementById('loginCard').style.display = 'block';
       document.getElementById('username').value = '';
       document.getElementById('password').value = '';
-      requestData = [];
     }
 
-    // Cek session saat halaman dimuat
     if (sessionStorage.getItem('adminAuth') === '1') showDashboard();
 
     ['username','password'].forEach(id => {
       document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
     });
 
-    // ── Data ────────────────────────────────────────────────
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('viewDesignRequests').style.display = (tab === 'design') ? 'block' : 'none';
+      document.getElementById('viewLinkBank').style.display       = (tab === 'link') ? 'block' : 'none';
+
+      const btnDesign = document.getElementById('tabBtnDesign');
+      const btnLink   = document.getElementById('tabBtnLink');
+
+      if (tab === 'design') {
+        btnDesign.style.background = 'var(--gold)'; btnDesign.style.color = '#fff'; btnDesign.style.borderColor = 'var(--gold)';
+        btnLink.style.background = 'transparent'; btnLink.style.color = 'var(--text)'; btnLink.style.borderColor = 'var(--border)';
+        loadData();
+      } else {
+        btnLink.style.background = 'var(--gold)'; btnLink.style.color = '#fff'; btnLink.style.borderColor = 'var(--gold)';
+        btnDesign.style.background = 'transparent'; btnDesign.style.color = 'var(--text)'; btnDesign.style.borderColor = 'var(--border)';
+        loadLinks();
+        loadAdminCategories();
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // MODULE 1: DESIGN REQUESTS
+    // ════════════════════════════════════════════════════════════
     async function loadData() {
       const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = `<tr><td colspan="6" class="table-state">
-        <span class="loading-dots"><span></span><span></span><span></span></span>
-        Fetching requests…
-      </td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span> Fetching requests…</td></tr>`;
 
       try {
         const res   = await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getRequests`);
@@ -475,9 +372,7 @@
         renderTable();
         updateStats();
       } catch {
-        tbody.innerHTML = `<tr><td colspan="6" class="table-state table-state--error">
-          Failed to load data. <button class="link-btn" onclick="loadData()">Try again</button>
-        </td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="table-state table-state--error">Failed to load data. <button class="link-btn" onclick="loadData()">Try again</button></td></tr>`;
       }
     }
 
@@ -511,7 +406,6 @@
       return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
     }
 
-    // ── Render ──────────────────────────────────────────────
     function renderTable() {
       const filter = document.getElementById('filterStatus').value;
       const tbody  = document.getElementById('tableBody');
@@ -534,42 +428,31 @@
         tr.innerHTML = `
           <td>
             <div class="requester-cell">
-              <span class="requester-name">${row.Name || '—'}</span>
-              <span class="requester-email">${row.Email || ''}</span>
+              <span class="requester-name">${escHtml(row.Name || '—')}</span>
+              <span class="requester-email">${escHtml(row.Email || '')}</span>
             </div>
           </td>
-          <td>${row.Department || '—'}</td>
+          <td>${escHtml(row.Department || '—')}</td>
           <td class="date-cell">${formatDate(row['Date Submit'])}</td>
           <td class="date-cell ${overdue ? 'overdue' : ''}">${formatDate(row.Deadline)}</td>
-          <td><span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span></td>
+          <td><span class="badge badge--${isPending ? 'pending' : 'done'}">${escHtml(row.Status)}</span></td>
           <td class="action-cell">
             <div class="row-actions">
               ${isPending
                 ? `<button class="btn-action" onclick="event.stopPropagation(); markAsDone(${idx})">Mark Done</button>`
-                : `<span class="done-check">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    Done
-                  </span>`}
-              <button class="btn-delete" onclick="event.stopPropagation(); openDeleteConfirm(${idx})">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-                Delete
+                : `<span class="done-check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Done</span>`}
+              <button class="btn-delete" onclick="event.stopPropagation(); openDeleteConfirm('design', ${idx})">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete
               </button>
             </div>
           </td>
         `;
-
-        tr.addEventListener('click', e => {
-          if (!e.target.closest('.action-cell')) openModal(idx);
-        });
-
+        tr.addEventListener('click', e => { if (!e.target.closest('.action-cell')) openModal(idx); });
         tbody.appendChild(tr);
       });
     }
 
     async function markAsDone(index) {
-      const btns = document.querySelectorAll(`button[onclick*="markAsDone(${index})"]`);
-      btns.forEach(b => { b.disabled = true; b.textContent = 'Updating…'; });
-
       try {
         await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=markDone&rowIndex=${index}`);
         requestData[index].Status = 'Done';
@@ -578,20 +461,18 @@
         showToast('✓ Request marked as done.', 'success');
         if (activeIndex === index) openModal(index);
       } catch {
-        btns.forEach(b => { b.disabled = false; b.textContent = 'Mark Done'; });
         showToast('✕ Failed to update. Try again.', 'error');
       }
     }
 
     async function markAsDoneFromModal() {
-      if (activeIndex === null) return;
-      await markAsDone(activeIndex);
+      if (activeIndex !== null) await markAsDone(activeIndex);
     }
 
     function openModal(index) {
-      const row       = requestData[index];
+      const row = requestData[index];
       if (!row) return;
-      activeIndex     = index;
+      activeIndex = index;
       const isPending = row.Status === 'Pending';
 
       document.getElementById('modalName').textContent      = row.Name || '—';
@@ -601,15 +482,13 @@
       document.getElementById('modalSubmitted').textContent = formatDate(row['Date Submit']);
       document.getElementById('modalDeadline').textContent  = formatDate(row.Deadline) + (isOverdue(row.Deadline, isPending) ? ' ⚠ Overdue' : '');
       document.getElementById('modalNotes').textContent     = row.Notes || '—';
-
-      document.getElementById('modalStatus').innerHTML =
-        `<span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span>`;
+      document.getElementById('modalStatus').innerHTML      = `<span class="badge badge--${isPending ? 'pending' : 'done'}">${row.Status}</span>`;
 
       const fileUrls   = getFileUrls(row);
       const filesField = document.getElementById('modalFilesField');
       const fileListEl = document.getElementById('modalFileList');
       if (fileUrls.length > 0) {
-        filesField.style.display = '';
+        filesField.style.display = 'flex';
         fileListEl.innerHTML = fileUrls.map((url, i) => `
           <a class="file-link" href="${url}" target="_blank" rel="noopener">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -622,13 +501,12 @@
       }
 
       document.getElementById('modalMarkDoneBtn').style.display = isPending ? 'inline-flex' : 'none';
-
-      document.getElementById('detailModal').classList.add('open');
+      document.getElementById('detailModal').style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
-      document.getElementById('detailModal').classList.remove('open');
+      document.getElementById('detailModal').style.display = 'none';
       document.body.style.overflow = '';
     }
 
@@ -636,61 +514,269 @@
       if (e.target === document.getElementById('detailModal')) closeModal();
     }
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeModal(); closeConfirm(); }
-    });
 
-    function openDeleteConfirm(index) {
-      activeIndex = index;
-      document.getElementById('confirmOverlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
+    // ════════════════════════════════════════════════════════════
+    // MODULE 2: LINK BANK
+    // ════════════════════════════════════════════════════════════
+    function loadLinks() {
+      const tbody = document.getElementById('linkTableBody');
+      tbody.innerHTML = `<tr><td colspan="4" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span> Fetching links…</td></tr>`;
+
+      fetch(`${window.API_URL}?action=getLinks&category=All`)
+        .then(res => res.json())
+        .then(links => {
+          allLinks = Array.isArray(links) ? links : [];
+          renderLinkTable(allLinks);
+          document.getElementById('linkCountBadge').textContent = `${allLinks.length} total links`;
+        })
+        .catch(() => {
+          tbody.innerHTML = `<tr><td colspan="4" class="table-state table-state--error">Failed to load links.</td></tr>`;
+        });
     }
 
-    function confirmDelete() {
-      document.getElementById('confirmOverlay').classList.add('open');
+    function loadAdminCategories() {
+      fetch(`${window.API_URL}?action=getCategories`)
+        .then(res => res.json())
+        .then(cats => {
+          linkCategories = Array.isArray(cats) ? cats : linkCategories;
+          renderCategoryUI();
+        })
+        .catch(err => {
+          renderCategoryUI(); // Render defaults if fetch fails
+        });
+    }
+
+    function renderCategoryUI() {
+      // 1. Select Dropdown
+      const select = document.getElementById('inputLinkCat');
+      const currentVal = select.value;
+      select.innerHTML = '<option value="">— Select Category —</option>';
+      linkCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat; opt.textContent = cat;
+        select.appendChild(opt);
+      });
+      if (currentVal) select.value = currentVal;
+
+      // 2. Filter Buttons
+      const filterBar = document.getElementById('linkFilterBar');
+      filterBar.innerHTML = `<button class="btn-outline link-tab-btn" data-cat="All" onclick="filterLinks('All')" style="background:var(--gold-tint); color:var(--gold-hover); border-color:rgba(186,143,46,0.3);">All</button>`;
+      
+      linkCategories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-outline link-tab-btn';
+        btn.setAttribute('data-cat', cat);
+        btn.onclick = function() { filterLinks(cat); };
+        btn.textContent = cat;
+        filterBar.appendChild(btn);
+      });
+    }
+
+    function filterLinks(category) {
+      document.querySelectorAll('.link-tab-btn').forEach(btn => {
+        if (btn.dataset.cat === category) {
+          btn.style.background = 'var(--gold-tint)';
+          btn.style.color = 'var(--gold-hover)';
+          btn.style.borderColor = 'rgba(186,143,46,0.3)';
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--text)';
+          btn.style.borderColor = 'var(--border)';
+        }
+      });
+      const filtered = category === 'All' ? allLinks : allLinks.filter(l => l.category === category);
+      renderLinkTable(filtered);
+    }
+
+    function renderLinkTable(links) {
+      const tbody = document.getElementById('linkTableBody');
+      if (!links.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="table-state">No links found in this category.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = links.map(item => `
+        <tr>
+          <td><span class="requester-name">${escHtml(item.name)}</span></td>
+          <td><span class="badge badge--done">${escHtml(item.category)}</span></td>
+          <td>
+            <a href="${escHtml(item.link)}" target="_blank" class="file-link" style="max-width:260px; overflow:hidden; text-overflow:ellipsis; display:inline-block; white-space:nowrap;">
+              ${escHtml(item.link)}
+            </a>
+          </td>
+          <td class="action-cell">
+            <div class="row-actions">
+              <button class="btn-action" onclick="startEditLink('${escAttr(item.id)}')">Edit</button>
+              <button class="btn-action" id="cpbtn-${escAttr(item.id)}" onclick="copyLinkText('${escAttr(item.link)}', '${escAttr(item.id)}')">Copy</button>
+              <button class="btn-delete" onclick="openDeleteConfirm('link', '${escAttr(item.id)}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function addNewCategory() {
+      const newCat = prompt("Enter new category name:");
+      if (!newCat || newCat.trim() === '') return;
+      const catName = newCat.trim();
+      
+      if (!linkCategories.some(c => c.toLowerCase() === catName.toLowerCase())) {
+        linkCategories.push(catName);
+        renderCategoryUI();
+        showToast(`Category "${catName}" added locally.`);
+      }
+      document.getElementById('inputLinkCat').value = catName;
+    }
+
+    function submitLink() {
+      const id       = document.getElementById('editLinkId').value;
+      const name     = document.getElementById('inputLinkName').value.trim();
+      const link     = document.getElementById('inputLinkUrl').value.trim();
+      const category = document.getElementById('inputLinkCat').value;
+      const btn      = document.getElementById('btnSubmitLink');
+
+      if (!name || !link || !category) { showToast('Please fill all required fields.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      const action = id ? 'updateLink' : 'addLink';
+      const payload = id ? { action, id, name, link, category } : { action, name, link, category };
+
+      fetch(window.API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          cancelEditLink();
+          loadLinks();
+          showToast(id ? 'Link updated successfully.' : 'Link added successfully.');
+        } else {
+          showToast(result.message || 'Error saving link.', 'error');
+        }
+      })
+      .catch(() => showToast('Connection error.', 'error'))
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'Save Link';
+      });
+    }
+
+    function startEditLink(id) {
+      const item = allLinks.find(l => l.id === id);
+      if (!item) return;
+
+      document.getElementById('editLinkId').value  = item.id;
+      document.getElementById('inputLinkName').value = item.name;
+      document.getElementById('inputLinkUrl').value  = item.link;
+      document.getElementById('inputLinkCat').value  = item.category;
+      
+      document.getElementById('formTitle').innerHTML = '<span style="display:block; width:4px; height:16px; background:var(--gold); border-radius:2px;"></span> Edit Link';
+      document.getElementById('btnSubmitLink').textContent = 'Update Link';
+      document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+      
+      document.getElementById('viewLinkBank').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelEditLink() {
+      document.getElementById('editLinkId').value  = '';
+      document.getElementById('inputLinkName').value = '';
+      document.getElementById('inputLinkUrl').value  = '';
+      document.getElementById('inputLinkCat').value  = '';
+      
+      document.getElementById('formTitle').innerHTML = '<span style="display:block; width:4px; height:16px; background:var(--gold); border-radius:2px;"></span> Add New Link';
+      document.getElementById('btnSubmitLink').textContent = 'Save Link';
+      document.getElementById('btnCancelEdit').style.display = 'none';
+    }
+
+    function copyLinkText(url, id) {
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('cpbtn-' + id);
+        if (btn) {
+          const original = btn.textContent;
+          btn.textContent = '✓ Copied';
+          btn.style.background = 'var(--success-bg)';
+          btn.style.color = 'var(--success)';
+          setTimeout(() => { 
+            btn.textContent = original; 
+            btn.style.background = '';
+            btn.style.color = '';
+          }, 2000);
+        }
+        showToast('Link copied to clipboard!');
+      }).catch(() => showToast('Failed to copy.', 'error'));
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // UNIFIED DELETE SYSTEM
+    // ════════════════════════════════════════════════════════════
+    function openDeleteConfirm(type, identifier) {
+      deleteContext = { type: type, id: identifier };
+      document.getElementById('confirmOverlay').style.display = 'flex';
+      if (!document.getElementById('detailModal').style.display || document.getElementById('detailModal').style.display === 'none') {
+        document.body.style.overflow = 'hidden';
+      }
     }
 
     function closeConfirm() {
-      document.getElementById('confirmOverlay').classList.remove('open');
-      if (!document.getElementById('detailModal').classList.contains('open')) {
+      document.getElementById('confirmOverlay').style.display = 'none';
+      if (document.getElementById('detailModal').style.display === 'none') {
         document.body.style.overflow = '';
       }
     }
 
-    async function executeDelete() {
-      if (activeIndex === null) return;
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+    });
 
-      const spinner = document.getElementById('deleteSpinner');
+    async function executeDelete() {
       const btnText = document.getElementById('deleteBtnText');
+      const spinner = document.getElementById('deleteSpinner');
       const btn     = document.getElementById('confirmDeleteBtn');
-      btn.disabled  = true;
+
+      btn.disabled = true;
       spinner.style.display = 'block';
-      btnText.textContent   = 'Deleting…';
+      btnText.textContent = 'Deleting…';
 
       try {
-        await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=deleteRequest&rowIndex=${activeIndex}`);
-        requestData.splice(activeIndex, 1);
-        activeIndex = null;
-        renderTable();
-        updateStats();
-        closeConfirm();
-        closeModal();
-        showToast('✓ Request deleted.', 'success');
-      } catch {
-        showToast('✕ Failed to delete. Try again.', 'error');
+        if (deleteContext.type === 'design') {
+          // DELETE DESIGN REQUEST
+          await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=deleteRequest&rowIndex=${deleteContext.id}`);
+          requestData.splice(deleteContext.id, 1);
+          renderTable();
+          updateStats();
+          showToast('✓ Request deleted successfully.', 'success');
+          closeModal();
+          
+        } else if (deleteContext.type === 'link') {
+          // DELETE LINK BANK
+          const res = await fetch(window.API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'deleteLink', id: deleteContext.id })
+          }).then(r => r.json());
+          
+          if (res.success) {
+            loadLinks();
+            showToast('✓ Link deleted successfully.', 'success');
+          } else {
+            showToast('✕ Failed to delete link.', 'error');
+          }
+        }
+      } catch (err) {
+        showToast('✕ Action failed. Try again.', 'error');
       } finally {
         btn.disabled = false;
         spinner.style.display = 'none';
-        btnText.textContent   = 'Delete';
+        btnText.textContent = 'Delete';
+        closeConfirm();
       }
     }
 
-    const showToast = (msg, type = 'success') => {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.className   = `show ${type}`;
-      setTimeout(() => { toast.className = ''; }, 4500);
-    };
   </script>
 </body>
 </html>
