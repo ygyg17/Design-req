@@ -295,7 +295,7 @@
       try {
         // Authenticate concurrently for both backends (Design & Links)
         const reqAuthPromise  = fetch(`${CONFIG.GAS_WEB_APP_URL}?action=verifyLogin&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`).then(r => r.json()).catch(() => ({ok: false}));
-        const linkAuthPromise = fetch(window.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'validateAdmin', username: user, password: pass }) }).then(r => r.json()).catch(() => ({success: false}));
+        const linkAuthPromise = fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'validateAdmin', username: user, password: pass }) }).then(r => r.json()).catch(() => ({success: false}));
 
         const [reqRes, linkRes] = await Promise.all([reqAuthPromise, linkAuthPromise]);
 
@@ -520,7 +520,7 @@
       const tbody = document.getElementById('linkTableBody');
       tbody.innerHTML = `<tr><td colspan="4" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span> Fetching links…</td></tr>`;
 
-      fetch(`${window.API_URL}?action=getLinks&category=All`)
+      fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getLinks&category=All`)
         .then(res => res.json())
         .then(links => {
           allLinks = Array.isArray(links) ? links : [];
@@ -533,7 +533,7 @@
     }
 
     function loadAdminCategories() {
-      fetch(`${window.API_URL}?action=getCategories`)
+      fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getCategories`)
         .then(res => res.json())
         .then(cats => {
           linkCategories = Array.isArray(cats) ? cats : linkCategories;
@@ -634,7 +634,7 @@
       const action = id ? 'updateLink' : 'addLink';
       const payload = id ? { action, id, name, link, category } : { action, name, link, category };
 
-      fetch(window.API_URL, {
+      fetch(CONFIG.GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
@@ -740,7 +740,7 @@
 
         } else if (deleteContext.type === 'link') {
           // DELETE LINK BANK
-          const res = await fetch(window.API_URL, {
+          const res = await fetch(CONFIG.GAS_WEB_APP_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'deleteLink', id: deleteContext.id })
