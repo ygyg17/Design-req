@@ -706,7 +706,7 @@
 
     <div class="config-banner" id="configBanner">
 
-      ⚠ API URL not configured. Open <code>config.js</code> and set <code>API_URL</code> to your deployed Google Apps Script Web App URL.
+      ⚠ API URL not configured. Open <code>config.js</code> and set <code>GAS_WEB_APP_URL</code> to your deployed Google Apps Script Web App URL.
 
     </div>
 
@@ -790,7 +790,7 @@
 
     // ── CONFIG CHECK ──
 
-    if (!window.API_URL || window.API_URL.indexOf('PASTE_YOUR') !== -1) {
+    if (!CONFIG.GAS_WEB_APP_URL || CONFIG.GAS_WEB_APP_URL.indexOf('PASTE_YOUR') !== -1) {
 
       document.getElementById('configBanner').style.display = 'block';
 
@@ -810,7 +810,7 @@
 
     function loadLinks() {
 
-      fetch(`${window.API_URL}?action=getLinks&category=All`)
+      fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getLinks&category=All`)
 
         .then(res => res.json())
 
@@ -834,7 +834,7 @@
 
     function loadCategories() {
 
-      fetch(`${window.API_URL}?action=getCategories`)
+      fetch(`${CONFIG.GAS_WEB_APP_URL}?action=getCategories`)
 
         .then(res => res.json())
 
@@ -1088,5 +1088,4 @@
 
 </body>
 
-</html> 
-
+</html>
