@@ -15,22 +15,22 @@
 <body>
 
   <header>
-    <div class="header-content" style="justify-content: space-between; width: 100%; max-width: 1040px;">
-      <div style="display: flex; align-items: center; gap: 14px;">
+    <div class="header-content admin-header-row">
+      <div class="admin-header-brand">
         <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
         <div class="brand-block">
           <span class="brand-eyebrow">Marketing Team</span>
           <span class="brand-name">Unified Admin Hub</span>
         </div>
       </div>
-      <div style="text-align: right; line-height: 1.4; display: flex; flex-direction: column; justify-content: center;">
-        <span id="clock-date" style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">—</span>
-        <span id="clock-time" style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--gold);">--:--</span>
+      <div class="admin-clock">
+        <span id="clock-date" class="admin-clock-date">—</span>
+        <span id="clock-time" class="admin-clock-time">--:--</span>
       </div>
     </div>
   </header>
 
-  <main style="padding-top: 32px;">
+  <main class="admin-main">
 
     <div class="card login-card" id="loginCard">
       <div class="card-heading">
@@ -52,12 +52,12 @@
       </button>
     </div>
 
-    <div class="card dashboard-card" id="dashboardCard" style="display:none; max-width: 1040px; width: 100%;">
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 16px; flex-wrap: wrap;">
-        <button id="tabBtnDesign" class="btn-outline" onclick="switchTab('design')" style="background: var(--gold); color: #fff; border-color: var(--gold);">Design Requests</button>
-        <button id="tabBtnLink" class="btn-outline" onclick="switchTab('link')">Link Bank</button>
-        <button class="btn-outline logout-btn" onclick="logout()" style="margin-left: auto;">Log Out</button>
+    <div class="card dashboard-card admin-dashboard-card" id="dashboardCard" style="display:none;">
+
+      <div class="admin-tab-bar">
+        <button id="tabBtnDesign" class="btn-outline tab-btn tab-btn--active" onclick="switchTab('design')">Design Requests</button>
+        <button id="tabBtnLink" class="btn-outline tab-btn" onclick="switchTab('link')">Link Bank</button>
+        <button class="btn-outline logout-btn admin-logout-btn" onclick="logout()">Log Out</button>
       </div>
 
       <div id="viewDesignRequests">
@@ -86,7 +86,7 @@
         <p class="table-hint">Click any row to view full details.</p>
 
         <div class="table-wrapper">
-          <table style="cursor: pointer;">
+          <table class="admin-table--clickable">
             <thead>
               <tr>
                 <th>Requester</th>
@@ -104,15 +104,15 @@
         </div>
       </div>
 
-      <div id="viewLinkBank" style="display: none;">
-        
-        <div style="background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 28px;">
-          <h2 class="dashboard-title" id="formTitle" style="font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            <span style="display: block; width: 4px; height: 16px; background: var(--gold); border-radius: 2px;"></span>
+      <div id="viewLinkBank" class="link-bank-view">
+
+        <div class="link-form-panel">
+          <h2 class="dashboard-title link-form-title" id="formTitle">
+            <span class="title-accent-bar"></span>
             Add New Link
           </h2>
           <input type="hidden" id="editLinkId" value="">
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="inputLinkName">Name <span class="req">*</span></label>
@@ -120,40 +120,39 @@
             </div>
             <div class="form-group">
               <label for="inputLinkCat">Category <span class="req">*</span></label>
-              <div style="display: flex; gap: 8px;">
+              <div class="link-cat-row">
                 <div class="select-wrapper" style="flex: 1;">
                   <select id="inputLinkCat">
                     <option value="">— Select Category —</option>
                   </select>
                   <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
-                <button class="btn-outline" onclick="addNewCategory()" style="padding: 0 14px; width: auto;">+ New</button>
+                <button class="btn-outline link-cat-add-btn" onclick="addNewCategory()">+ New</button>
               </div>
             </div>
           </div>
-          <div class="form-group" style="margin-bottom: 16px;">
+          <div class="form-group link-url-group">
             <label for="inputLinkUrl">URL Link <span class="req">*</span></label>
             <input type="url" id="inputLinkUrl" placeholder="https://...">
           </div>
-          
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button id="btnSubmitLink" onclick="submitLink()" style="width: auto; padding: 10px 24px; margin-top: 0;">Save Link</button>
+
+          <div class="link-form-actions">
+            <button id="btnSubmitLink" onclick="submitLink()" class="btn-inline">Save Link</button>
             <button id="btnCancelEdit" class="btn-outline" onclick="cancelEditLink()" style="display: none;">Cancel Edit</button>
           </div>
         </div>
 
-        <div class="dashboard-header" style="margin-bottom: 16px;">
+        <div class="dashboard-header link-bank-header">
           <div>
             <h2 class="dashboard-title">All Links</h2>
             <p class="dashboard-subtitle" id="linkCountBadge">0 total links</p>
           </div>
         </div>
 
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;" id="linkFilterBar">
-           </div>
+        <div class="link-filter-bar" id="linkFilterBar"></div>
 
         <div class="table-wrapper">
-          <table style="cursor: default;">
+          <table class="admin-table--static">
             <thead>
               <tr>
                 <th>Link Name</th>
@@ -179,36 +178,36 @@
 
   <div id="toast" role="alert" aria-live="assertive"></div>
 
-  <div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500; align-items:center; justify-content:center; padding:20px;">
-    <div class="modal" id="modalBox" style="background:var(--surface); border-radius:18px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.18);">
-      <div class="modal-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:24px 28px 20px; border-bottom:1px solid var(--border);">
-        <div class="modal-header-info" style="flex:1; min-width:0;">
-          <div class="modal-title" id="modalName" style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
-          <div class="modal-meta" id="modalMeta" style="font-size:12.5px; color:var(--text-muted);">—</div>
+  <div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modalBox">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-title" id="modalName">—</div>
+          <div class="modal-meta" id="modalMeta">—</div>
         </div>
-        <button class="btn-outline" onclick="closeModal()" style="padding:4px; border:none; box-shadow:none; border-radius:6px; cursor:pointer;">
+        <button class="modal-close-btn" onclick="closeModal()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      <div class="modal-body" style="padding:24px 28px; display:flex; flex-direction:column; gap:20px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px 24px;">
-          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Email</span><span id="modalEmail" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
-          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Department</span><span id="modalDept" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
-          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Date Submitted</span><span id="modalSubmitted" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
-          <div style="display:flex; flex-direction:column; gap:5px;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Deadline</span><span id="modalDeadline" style="font-size:14px; color:var(--text); word-break:break-word;">—</span></div>
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div class="modal-field"><span class="modal-field-label">Email</span><span id="modalEmail" class="modal-field-value">—</span></div>
+          <div class="modal-field"><span class="modal-field-label">Department</span><span id="modalDept" class="modal-field-value">—</span></div>
+          <div class="modal-field"><span class="modal-field-label">Date Submitted</span><span id="modalSubmitted" class="modal-field-value">—</span></div>
+          <div class="modal-field"><span class="modal-field-label">Deadline</span><span id="modalDeadline" class="modal-field-value">—</span></div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:5px;">
-          <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Design Brief &amp; Notes</span>
-          <span id="modalNotes" style="font-size:14px; color:var(--text); line-height:1.6; white-space:pre-wrap; word-break:break-word;">—</span>
+        <div class="modal-field">
+          <span class="modal-field-label">Design Brief &amp; Notes</span>
+          <span id="modalNotes" class="modal-field-value modal-notes-value">—</span>
         </div>
-        <div id="modalFilesField" style="display:none; flex-direction:column; gap:5px;">
-          <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted);">Attached Files</span>
-          <div id="modalFileList" style="display:flex; flex-direction:column; gap:6px;"></div>
+        <div id="modalFilesField" class="modal-files-field">
+          <span class="modal-field-label">Attached Files</span>
+          <div id="modalFileList" class="modal-file-list"></div>
         </div>
       </div>
-      <div class="modal-footer" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 28px 24px; border-top:1px solid var(--border); flex-wrap:wrap;">
+      <div class="modal-footer">
         <span id="modalStatus"></span>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="modal-footer-actions">
           <button class="btn-action" id="modalMarkDoneBtn" onclick="markAsDoneFromModal()" style="display:none;">Mark as Done</button>
           <button class="btn-delete" id="modalDeleteBtn" onclick="openDeleteConfirm('design', activeIndex)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -219,17 +218,17 @@
     </div>
   </div>
 
-  <div id="confirmOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:600; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:var(--surface); border-radius:14px; width:100%; max-width:400px; padding:28px; box-shadow:0 24px 64px rgba(0,0,0,0.2);">
-      <div style="width:44px; height:44px; background:var(--error-bg); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:16px; color:var(--error);">
+  <div id="confirmOverlay" class="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </div>
-      <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:6px;">Delete this item?</div>
-      <p style="font-size:13.5px; color:var(--text-muted); line-height:1.55; margin-bottom:24px;">This will permanently remove the data. This action cannot be undone.</p>
-      <div style="display:flex; gap:10px; justify-content:flex-end;">
-        <button class="btn-outline" onclick="closeConfirm()" style="padding:10px 18px;">Cancel</button>
-        <button class="btn-delete" id="confirmDeleteBtn" onclick="executeDelete()" style="padding:10px 18px; background:var(--error); color:#fff; border:none;">
-          <span class="spinner" id="deleteSpinner" aria-hidden="true" style="border-top-color:#fff;"></span>
+      <div class="confirm-title">Delete this item?</div>
+      <p class="confirm-text">This will permanently remove the data. This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-outline" onclick="closeConfirm()">Cancel</button>
+        <button class="btn-delete confirm-delete-btn" id="confirmDeleteBtn" onclick="executeDelete()">
+          <span class="spinner" id="deleteSpinner" aria-hidden="true"></span>
           <span id="deleteBtnText">Delete</span>
         </button>
       </div>
@@ -244,7 +243,7 @@
     let requestData    = [];
     let allLinks       = [];
     let linkCategories = ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
-    
+
     let activeTab      = 'design'; // 'design' or 'link'
     let activeIndex    = null;     // Used for Design Requests
     let deleteContext  = { type: null, id: null }; // Unified deletion context
@@ -272,8 +271,8 @@
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-    function escAttr(str) { 
-      return String(str).replace(/'/g, "\\'"); 
+    function escAttr(str) {
+      return String(str).replace(/'/g, "\\'");
     }
 
     // ════════════════════════════════════════════════════════════
@@ -347,13 +346,12 @@
       const btnDesign = document.getElementById('tabBtnDesign');
       const btnLink   = document.getElementById('tabBtnLink');
 
+      btnDesign.classList.toggle('tab-btn--active', tab === 'design');
+      btnLink.classList.toggle('tab-btn--active', tab === 'link');
+
       if (tab === 'design') {
-        btnDesign.style.background = 'var(--gold)'; btnDesign.style.color = '#fff'; btnDesign.style.borderColor = 'var(--gold)';
-        btnLink.style.background = 'transparent'; btnLink.style.color = 'var(--text)'; btnLink.style.borderColor = 'var(--border)';
         loadData();
       } else {
-        btnLink.style.background = 'var(--gold)'; btnLink.style.color = '#fff'; btnLink.style.borderColor = 'var(--gold)';
-        btnDesign.style.background = 'transparent'; btnDesign.style.color = 'var(--text)'; btnDesign.style.borderColor = 'var(--border)';
         loadLinks();
         loadAdminCategories();
       }
@@ -501,12 +499,12 @@
       }
 
       document.getElementById('modalMarkDoneBtn').style.display = isPending ? 'inline-flex' : 'none';
-      document.getElementById('detailModal').style.display = 'flex';
+      document.getElementById('detailModal').classList.add('is-open');
       document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
-      document.getElementById('detailModal').style.display = 'none';
+      document.getElementById('detailModal').classList.remove('is-open');
       document.body.style.overflow = '';
     }
 
@@ -560,8 +558,8 @@
 
       // 2. Filter Buttons
       const filterBar = document.getElementById('linkFilterBar');
-      filterBar.innerHTML = `<button class="btn-outline link-tab-btn" data-cat="All" onclick="filterLinks('All')" style="background:var(--gold-tint); color:var(--gold-hover); border-color:rgba(186,143,46,0.3);">All</button>`;
-      
+      filterBar.innerHTML = `<button class="btn-outline link-tab-btn link-tab-btn--active" data-cat="All" onclick="filterLinks('All')">All</button>`;
+
       linkCategories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = 'btn-outline link-tab-btn';
@@ -574,15 +572,7 @@
 
     function filterLinks(category) {
       document.querySelectorAll('.link-tab-btn').forEach(btn => {
-        if (btn.dataset.cat === category) {
-          btn.style.background = 'var(--gold-tint)';
-          btn.style.color = 'var(--gold-hover)';
-          btn.style.borderColor = 'rgba(186,143,46,0.3)';
-        } else {
-          btn.style.background = 'transparent';
-          btn.style.color = 'var(--text)';
-          btn.style.borderColor = 'var(--border)';
-        }
+        btn.classList.toggle('link-tab-btn--active', btn.dataset.cat === category);
       });
       const filtered = category === 'All' ? allLinks : allLinks.filter(l => l.category === category);
       renderLinkTable(filtered);
@@ -600,7 +590,7 @@
           <td><span class="requester-name">${escHtml(item.name)}</span></td>
           <td><span class="badge badge--done">${escHtml(item.category)}</span></td>
           <td>
-            <a href="${escHtml(item.link)}" target="_blank" class="file-link" style="max-width:260px; overflow:hidden; text-overflow:ellipsis; display:inline-block; white-space:nowrap;">
+            <a href="${escHtml(item.link)}" target="_blank" class="file-link link-url-cell">
               ${escHtml(item.link)}
             </a>
           </td>
@@ -621,7 +611,7 @@
       const newCat = prompt("Enter new category name:");
       if (!newCat || newCat.trim() === '') return;
       const catName = newCat.trim();
-      
+
       if (!linkCategories.some(c => c.toLowerCase() === catName.toLowerCase())) {
         linkCategories.push(catName);
         renderCategoryUI();
@@ -674,11 +664,11 @@
       document.getElementById('inputLinkName').value = item.name;
       document.getElementById('inputLinkUrl').value  = item.link;
       document.getElementById('inputLinkCat').value  = item.category;
-      
-      document.getElementById('formTitle').innerHTML = '<span style="display:block; width:4px; height:16px; background:var(--gold); border-radius:2px;"></span> Edit Link';
+
+      document.getElementById('formTitle').innerHTML = '<span class="title-accent-bar"></span> Edit Link';
       document.getElementById('btnSubmitLink').textContent = 'Update Link';
       document.getElementById('btnCancelEdit').style.display = 'inline-flex';
-      
+
       document.getElementById('viewLinkBank').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -687,8 +677,8 @@
       document.getElementById('inputLinkName').value = '';
       document.getElementById('inputLinkUrl').value  = '';
       document.getElementById('inputLinkCat').value  = '';
-      
-      document.getElementById('formTitle').innerHTML = '<span style="display:block; width:4px; height:16px; background:var(--gold); border-radius:2px;"></span> Add New Link';
+
+      document.getElementById('formTitle').innerHTML = '<span class="title-accent-bar"></span> Add New Link';
       document.getElementById('btnSubmitLink').textContent = 'Save Link';
       document.getElementById('btnCancelEdit').style.display = 'none';
     }
@@ -699,12 +689,10 @@
         if (btn) {
           const original = btn.textContent;
           btn.textContent = '✓ Copied';
-          btn.style.background = 'var(--success-bg)';
-          btn.style.color = 'var(--success)';
-          setTimeout(() => { 
-            btn.textContent = original; 
-            btn.style.background = '';
-            btn.style.color = '';
+          btn.classList.add('btn-action--copied');
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.remove('btn-action--copied');
           }, 2000);
         }
         showToast('Link copied to clipboard!');
@@ -716,15 +704,13 @@
     // ════════════════════════════════════════════════════════════
     function openDeleteConfirm(type, identifier) {
       deleteContext = { type: type, id: identifier };
-      document.getElementById('confirmOverlay').style.display = 'flex';
-      if (!document.getElementById('detailModal').style.display || document.getElementById('detailModal').style.display === 'none') {
-        document.body.style.overflow = 'hidden';
-      }
+      document.getElementById('confirmOverlay').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeConfirm() {
-      document.getElementById('confirmOverlay').style.display = 'none';
-      if (document.getElementById('detailModal').style.display === 'none') {
+      document.getElementById('confirmOverlay').classList.remove('is-open');
+      if (!document.getElementById('detailModal').classList.contains('is-open')) {
         document.body.style.overflow = '';
       }
     }
@@ -751,7 +737,7 @@
           updateStats();
           showToast('✓ Request deleted successfully.', 'success');
           closeModal();
-          
+
         } else if (deleteContext.type === 'link') {
           // DELETE LINK BANK
           const res = await fetch(window.API_URL, {
@@ -759,7 +745,7 @@
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'deleteLink', id: deleteContext.id })
           }).then(r => r.json());
-          
+
           if (res.success) {
             loadLinks();
             showToast('✓ Link deleted successfully.', 'success');
