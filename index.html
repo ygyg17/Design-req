@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* ── Marquee Gallery ─────────────────────────────────────── */
     .gallery-section {
       margin-bottom: 44px;
       overflow: hidden;
@@ -71,7 +70,6 @@
       border-color: rgba(186,143,46,0.5);
     }
 
-    /* fade edges */
     .gallery-section::before,
     .gallery-section::after {
       content: '';
@@ -81,16 +79,17 @@
       z-index: 2;
       pointer-events: none;
     }
+
     .gallery-section::before {
       left: 0;
       background: linear-gradient(to right, var(--bg), transparent);
     }
+
     .gallery-section::after {
       right: 0;
       background: linear-gradient(to left, var(--bg), transparent);
     }
 
-    /* ── Home layout ──────────────────────────────────────── */
     .home-container {
       max-width: 820px;
       width: 100%;
@@ -118,7 +117,6 @@
       margin: 0 auto;
     }
 
-    /* ── Nav Cards ────────────────────────────────────────── */
     .nav-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -213,18 +211,15 @@
   <main>
     <div class="home-container">
 
-      <!-- Marquee Gallery -->
       <div class="gallery-section">
         <div class="gallery-track" id="galleryTrack"></div>
       </div>
 
-      <!-- Section Header -->
       <div class="home-header">
         <h1 class="home-title">Welcome to Marketing Dashboard</h1>
         <p class="home-subtitle">Select a module below to submit a new design request or access our internal team links</p>
       </div>
 
-      <!-- Nav Cards -->
       <div class="nav-grid">
         <a href="design.html" class="nav-card">
           <div class="nav-icon">
@@ -270,7 +265,6 @@
     const files = ['Image01.webp','Image02.webp','Image03.webp','Image04.webp','Image05.webp','Image06.webp','Image07.webp'];
     const track = document.getElementById('galleryTrack');
 
-    // duplicate for seamless loop
     [...files, ...files].forEach((file, i) => {
       const card = document.createElement('div');
       card.className = 'gallery-card';
