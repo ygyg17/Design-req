@@ -66,7 +66,6 @@
 
 
 
-    /* ── HEADER ── */
 
     header {
 
@@ -206,7 +205,6 @@
 
 
 
-    /* ── MAIN ── */
 
     main {
 
@@ -262,7 +260,6 @@
 
 
 
-    /* ── CONFIG BANNER ── */
 
     .config-banner {
 
@@ -298,7 +295,6 @@
 
 
 
-    /* ── FILTER TABS ── */
 
     .filter-bar {
 
@@ -398,7 +394,6 @@
 
 
 
-    /* ── LINK LIST ── */
 
     .link-list { display: flex; flex-direction: column; gap: 8px; }
 
@@ -542,7 +537,6 @@
 
 
 
-    /* ── EMPTY STATE ── */
 
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
 
@@ -550,7 +544,6 @@
 
 
 
-    /* ── LOADING ── */
 
     .skeleton { display: flex; flex-direction: column; gap: 8px; }
 
@@ -572,7 +565,6 @@
 
 
 
-    /* ── TOAST ── */
 
     #toast {
 
@@ -612,7 +604,6 @@
 
 
 
-    /* ── FOOTER ── */
 
     footer {
 
@@ -634,7 +625,6 @@
 
 
 
-    /* ── RESPONSIVE ── */
 
     @media (max-width: 480px) {
 
@@ -761,7 +751,6 @@
 
   <script>
 
-    // ── CLOCK ──
 
     function updateClock() {
 
@@ -787,7 +776,6 @@
 
 
 
-    // ── CONFIG CHECK ──
 
     if (!window.API_URL || window.API_URL.indexOf('PASTE_YOUR') !== -1) {
 
@@ -797,7 +785,6 @@
 
 
 
-    // ── STATE ──
 
     let allLinks = [];
 
@@ -805,7 +792,6 @@
 
 
 
-    // ── LOAD LINKS ──
 
     function loadLinks() {
 
@@ -943,7 +929,6 @@
 
 
 
-    // ── RENDER ──
 
     function renderLinks(links, showBadge) {
 
@@ -1001,13 +986,11 @@
 
 
 
-    // ── OPEN LINK ──
 
     function openLink(url) { window.open(url, '_blank', 'noopener,noreferrer'); }
 
 
 
-    // ── COPY LINK ──
 
     function copyLink(url, id) {
 
@@ -1049,7 +1032,6 @@
 
 
 
-    // ── TOAST ──
 
     function showToast(msg) {
 
@@ -1065,7 +1047,6 @@
 
 
 
-    // ── ESCAPE HELPERS ──
 
     function escHtml(str) {
 
@@ -1077,7 +1058,6 @@
 
 
 
-    // ── INIT ──
 
     loadLinks();
 
