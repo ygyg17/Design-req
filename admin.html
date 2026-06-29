@@ -237,18 +237,14 @@
 
   <script src="config.js"></script>
   <script>
-    // ════════════════════════════════════════════════════════════
-    // GLOBAL STATE & UTILITIES
-    // ════════════════════════════════════════════════════════════
     let requestData    = [];
     let allLinks       = [];
     let linkCategories = ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
 
-    let activeTab      = 'design'; // 'design' or 'link'
-    let activeIndex    = null;     // Used for Design Requests
-    let deleteContext  = { type: null, id: null }; // Unified deletion context
+    let activeTab      = 'design';
+    let activeIndex    = null;
+    let deleteContext  = { type: null, id: null };
 
-    // ── CLOCK ──
     function updateClock() {
       const now = new Date();
       const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -259,7 +255,6 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    // ── TOAST ──
     function showToast(msg, type = 'success') {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -267,7 +262,6 @@
       setTimeout(() => { toast.className = ''; }, 3500);
     }
 
-    // ── ESCAPE HELPERS ──
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
@@ -275,9 +269,6 @@
       return String(str).replace(/'/g, "\\'");
     }
 
-    // ════════════════════════════════════════════════════════════
-    // AUTHENTICATION & NAVIGATION
-    // ════════════════════════════════════════════════════════════
     async function login() {
       const user    = document.getElementById('username').value.trim();
       const pass    = document.getElementById('password').value;
@@ -293,13 +284,11 @@
       btnText.textContent   = 'Authenticating…';
 
       try {
-        // Authenticate concurrently for both backends (Design & Links)
         const reqAuthPromise  = fetch(`${CONFIG.GAS_WEB_APP_URL}?action=verifyLogin&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`).then(r => r.json()).catch(() => ({ok: false}));
         const linkAuthPromise = fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'validateAdmin', username: user, password: pass }) }).then(r => r.json()).catch(() => ({success: false}));
 
         const [reqRes, linkRes] = await Promise.all([reqAuthPromise, linkAuthPromise]);
 
-        // Grant access if either authentication point succeeds
         if (reqRes.ok || linkRes.success) {
           errorEl.textContent = '';
           sessionStorage.setItem('adminAuth', '1');
@@ -321,7 +310,7 @@
     function showDashboard() {
       document.getElementById('loginCard').style.display = 'none';
       document.getElementById('dashboardCard').style.display = 'block';
-      switchTab('design'); // Default tab
+      switchTab('design');
     }
 
     function logout() {
@@ -357,9 +346,6 @@
       }
     }
 
-    // ════════════════════════════════════════════════════════════
-    // MODULE 1: DESIGN REQUESTS
-    // ════════════════════════════════════════════════════════════
     async function loadData() {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = `<tr><td colspan="6" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span> Fetching requests…</td></tr>`;
@@ -418,7 +404,7 @@
       }
 
       rows.forEach(row => {
-        const idx       = requestData.indexOf(row);
+        const idx        = requestData.indexOf(row);
         const isPending = row.Status === 'Pending';
         const overdue   = isOverdue(row.Deadline, isPending);
 
@@ -512,10 +498,6 @@
       if (e.target === document.getElementById('detailModal')) closeModal();
     }
 
-
-    // ════════════════════════════════════════════════════════════
-    // MODULE 2: LINK BANK
-    // ════════════════════════════════════════════════════════════
     function loadLinks() {
       const tbody = document.getElementById('linkTableBody');
       tbody.innerHTML = `<tr><td colspan="4" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span> Fetching links…</td></tr>`;
@@ -540,12 +522,11 @@
           renderCategoryUI();
         })
         .catch(err => {
-          renderCategoryUI(); // Render defaults if fetch fails
+          renderCategoryUI();
         });
     }
 
     function renderCategoryUI() {
-      // 1. Select Dropdown
       const select = document.getElementById('inputLinkCat');
       const currentVal = select.value;
       select.innerHTML = '<option value="">— Select Category —</option>';
@@ -556,7 +537,6 @@
       });
       if (currentVal) select.value = currentVal;
 
-      // 2. Filter Buttons
       const filterBar = document.getElementById('linkFilterBar');
       filterBar.innerHTML = `<button class="btn-outline link-tab-btn link-tab-btn--active" data-cat="All" onclick="filterLinks('All')">All</button>`;
 
@@ -699,9 +679,6 @@
       }).catch(() => showToast('Failed to copy.', 'error'));
     }
 
-    // ════════════════════════════════════════════════════════════
-    // UNIFIED DELETE SYSTEM
-    // ════════════════════════════════════════════════════════════
     function openDeleteConfirm(type, identifier) {
       deleteContext = { type: type, id: identifier };
       document.getElementById('confirmOverlay').classList.add('is-open');
@@ -730,7 +707,6 @@
 
       try {
         if (deleteContext.type === 'design') {
-          // DELETE DESIGN REQUEST
           await fetch(`${CONFIG.GAS_WEB_APP_URL}?action=deleteRequest&rowIndex=${deleteContext.id}`);
           requestData.splice(deleteContext.id, 1);
           renderTable();
@@ -739,7 +715,6 @@
           closeModal();
 
         } else if (deleteContext.type === 'link') {
-          // DELETE LINK BANK
           const res = await fetch(CONFIG.GAS_WEB_APP_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
