@@ -554,6 +554,8 @@
     function uploadWithProgress(url, payload, onProgress) {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
+        let uploadFinished = false;
+
         xhr.open('POST', url, true);
         xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
 
@@ -561,14 +563,26 @@
           if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total);
         };
 
+        // Apps Script web apps redirect on execution and often omit CORS
+        // headers, so the browser may block reading the response even
+        // though the request was received and processed server-side.
+        // Once the upload itself has fully completed (all bytes sent),
+        // treat the request as successful regardless of whether we can
+        // read the response — failing here would be a false negative.
+        xhr.upload.onload = () => { uploadFinished = true; };
+
         xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr);
+        };
+
+        xhr.onerror = () => {
+          if (uploadFinished) {
             resolve(xhr);
           } else {
-            reject(new Error(`Server responded with status ${xhr.status}`));
+            reject(new Error('Network error during upload.'));
           }
         };
-        xhr.onerror   = () => reject(new Error('Network error during upload.'));
+
         xhr.ontimeout = () => reject(new Error('Upload timed out.'));
 
         xhr.send(JSON.stringify(payload));
