@@ -227,7 +227,7 @@
 
         <div class="form-group">
           <label>Supporting File(s) <span class="req" aria-hidden="true">*</span></label>
-          <p class="field-hint">Max 10 MB per file · Max 5 files · Allowed: JPG, PNG, PDF, AI, PSD, DOCX, XLSX, MP4, ZIP</p>
+          <p class="field-hint">Max 20 MB per file · Max 5 files · Allowed: JPG, PNG, PDF, AI, PSD, DOCX, XLSX, MP4, ZIP</p>
 
           <input
             type="file"
@@ -243,7 +243,7 @@
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
             <span class="file-msg" id="fileMsg">Click or drag file(s) here</span>
-            <span class="file-submsg">Max 10 MB per file · Max 5 files</span>
+            <span class="file-submsg">Max 20 MB per file · Max 5 files</span>
           </div>
 
           <div class="file-list" id="fileList"></div>
@@ -252,7 +252,7 @@
 
         <div class="form-group">
           <label for="notes">Design Brief &amp; Notes <span class="req" aria-hidden="true">*</span></label>
-          <textarea id="notes" name="notes" placeholder="Describe your request in detail — include dimensions, tone, target audience, and any references…" required maxlength="3000"></textarea>
+          <textarea id="notes" name="notes" placeholder="Describe your request in detail include dimensions and any references…" required maxlength="3000"></textarea>
           <span class="field-error" id="notesError"></span>
         </div>
 
@@ -285,7 +285,7 @@
   <script>
 
     const SECURITY = {
-      MAX_FILE_SIZE_MB   : 10,
+      MAX_FILE_SIZE_MB   : 20,
       MAX_FILE_COUNT     : 5,
       MAX_NOTES_LENGTH   : 3000,
       MAX_NAME_LENGTH    : 100,
