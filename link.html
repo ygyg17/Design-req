@@ -2,100 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Link Bank — The Seminyak</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="config.js"></script>
 </head>
+<body>
 
-<!-- Halaman publik: TIDAK ada data-require-role, jadi auth.js (kalau ikut di-load di halaman lain) tidak akan memblokir ini -->
-<body data-active-page="link">
-
-  <nav class="topbar">
-    <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
-    <div class="topbar-div"></div>
-    <span class="topbar-title">Link Bank</span>
-    <div class="topbar-clock" id="mastClock" style="margin-left:auto;">—</div>
-  </nav>
-
-  <div class="body-wrap" style="grid-template-columns:1fr; margin-left:0;">
-
-    <div class="right-panel" style="max-width:900px;margin:0 auto;width:100%;">
-      <div class="board-header">
-        <div class="board-title-wrap">
-          <h2>All Links</h2>
-          <div class="board-sub">Saved links organized by category</div>
-        </div>
-        <span class="count-badge" id="linkCountBadge">loading...</span>
-      </div>
-
-      <div class="filter-bar">
-        <div class="chips" id="linkFilterBar"></div>
-        <div class="search-wrap" id="searchWrapBox">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input id="searchInput" type="text" placeholder="Search links...">
-          <button type="button" class="search-clear" id="searchClear">&times;</button>
-        </div>
-      </div>
-
-      <div class="board">
-        <div class="table-wrapper">
-          <table class="req-table">
-            <thead>
-              <tr>
-                <th>Link Name</th>
-                <th>Category</th>
-                <th>URL</th>
-                <th style="text-align:right;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="linkTableBody">
-              <tr><td colspan="4" class="state-box"><div class="state-spinner"></div><div class="state-label">Loading links...</div></td></tr>
-            </tbody>
-          </table>
-        </div>
+  <header>
+    <div class="header-content">
+      <img src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
+      <div class="brand-block">
+        <div class="brand-eyebrow">The Seminyak</div>
+        <div class="brand-name">Link Bank</div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div id="toastOk" class="toast toast-ok"><span class="toast-icon">✓</span><span id="toastOkMsg">Success</span></div>
-  <div id="toastErr" class="toast toast-err"><span class="toast-icon">✕</span><span id="toastErrMsg">Error occurred</span></div>
+  <main>
+    <div class="card dashboard-card">
+      <div class="dashboard-header">
+        <div>
+          <div class="dashboard-title">All Links</div>
+          <div class="dashboard-subtitle">Saved links organized by category</div>
+        </div>
+        <div class="dashboard-controls">
+          <input type="text" id="searchInput" placeholder="Search links..." style="width:200px;">
+        </div>
+      </div>
+
+      <div class="link-bank-header">
+        <div class="link-filter-bar" id="linkFilterBar"></div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Link Name</th>
+              <th>Category</th>
+              <th>URL</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="linkTableBody">
+            <tr><td colspan="4" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span>Loading links...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <footer>
+    <span>&copy; The Seminyak</span>
+  </footer>
 
   <script>
-    // Client Supabase read-only (anon key). RLS di tabel `links` mengizinkan SELECT untuk siapa saja.
     const sbLink = supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
-
-    function tickClock() {
-      const now = new Date();
-      const d = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      const t = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('mastClock').innerHTML = d + '&nbsp;&nbsp;<b>' + t + '</b>';
-    }
-    tickClock(); setInterval(tickClock, 30000);
 
     function esc(s) { return !s ? '' : String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function escAttr(s) { return String(s).replace(/'/g, "\\'"); }
-    function showToast(id, msgId, msg, dur) {
-      const el = document.getElementById(id);
-      document.getElementById(msgId).textContent = msg;
+
+    function showToast(msg, type) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = type || '';
       el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), dur || 3000);
+      setTimeout(() => el.classList.remove('show'), 3000);
     }
-    function showErr(msg) { showToast('toastErr','toastErrMsg',msg,3500); }
 
     let allLinks = [];
     let activeFilter = 'All';
 
     async function loadLinks() {
       const tbody = document.getElementById('linkTableBody');
-      tbody.innerHTML = '<tr><td colspan="4" class="state-box"><div class="state-spinner"></div><div class="state-label">Loading links...</div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="table-state"><span class="loading-dots"><span></span><span></span><span></span></span>Loading links...</td></tr>';
 
       const { data, error } = await sbLink
         .from('links')
@@ -105,7 +91,7 @@
 
       if (error) {
         console.error(error);
-        tbody.innerHTML = '<tr><td colspan="4" class="state-box"><div class="state-icon">!</div><div class="state-label" style="color:var(--urgent);">Failed to load links.</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="table-state table-state--error">Failed to load links.</td></tr>';
         return;
       }
 
@@ -116,20 +102,19 @@
 
     function renderFilterBar() {
       const cats = [...new Set(allLinks.map(l => l.category))].sort();
-      const filterBar = document.getElementById('linkFilterBar');
-      let html = `<div class="chip ${activeFilter === 'All' ? 'active' : ''}" data-cat="All">All</div>`;
+      const bar = document.getElementById('linkFilterBar');
+      let html = `<button type="button" class="btn-outline link-tab-btn ${activeFilter === 'All' ? 'link-tab-btn--active' : ''}" data-cat="All">All</button>`;
       cats.forEach(cat => {
-        html += `<div class="chip ${activeFilter === cat ? 'active' : ''}" data-cat="${escAttr(cat)}">${esc(cat)}</div>`;
+        html += `<button type="button" class="btn-outline link-tab-btn ${activeFilter === cat ? 'link-tab-btn--active' : ''}" data-cat="${escAttr(cat)}">${esc(cat)}</button>`;
       });
-      filterBar.innerHTML = html;
+      bar.innerHTML = html;
     }
 
     document.getElementById('linkFilterBar').addEventListener('click', function(e) {
-      const chip = e.target.closest('.chip');
-      if (!chip) return;
-      document.querySelectorAll('#linkFilterBar .chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      activeFilter = chip.dataset.cat;
+      const btn = e.target.closest('.link-tab-btn');
+      if (!btn) return;
+      activeFilter = btn.dataset.cat;
+      renderFilterBar();
       renderLinkTable();
     });
 
@@ -145,38 +130,28 @@
         );
       }
 
-      document.getElementById('linkCountBadge').textContent = filtered.length + ' links';
-
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="state-box"><div class="state-icon">◌</div><div class="state-label">${q ? 'No results found' : 'No links in this category'}</div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="table-state">${q ? 'No results found' : 'No links in this category'}</td></tr>`;
         return;
       }
 
       tbody.innerHTML = filtered.map(item => `
         <tr>
-          <td data-label="Link Name"><div style="font-weight:600;color:var(--ink);">${esc(item.name)}</div></td>
-          <td data-label="Category"><span class="pill pill-date">${esc(item.category)}</span></td>
-          <td data-label="URL">
-            <a href="${esc(item.url)}" target="_blank" rel="noopener" style="color:var(--gold); font-size:12.5px; text-decoration:none; word-break:break-all;">
+          <td>${esc(item.name)}</td>
+          <td><span class="badge badge--pending">${esc(item.category)}</span></td>
+          <td>
+            <a href="${esc(item.url)}" target="_blank" rel="noopener" class="file-link link-url-cell" title="${escAttr(item.url)}">
               ${esc(item.url)}
             </a>
           </td>
-          <td data-label="Action" style="text-align:right;">
-            <button class="btn-sm" id="cpbtn-${escAttr(item.id)}" onclick="copyLink('${escAttr(item.url)}', '${escAttr(item.id)}')">Copy</button>
+          <td class="action-cell">
+            <button type="button" class="btn-action" id="cpbtn-${escAttr(item.id)}" onclick="copyLink('${escAttr(item.url)}', '${escAttr(item.id)}')">Copy</button>
           </td>
         </tr>
       `).join('');
     }
 
-    document.getElementById('searchInput').addEventListener('input', function() {
-      document.getElementById('searchClear').classList.toggle('visible', this.value.length > 0);
-      renderLinkTable();
-    });
-    document.getElementById('searchClear').addEventListener('click', function() {
-      document.getElementById('searchInput').value = '';
-      this.classList.remove('visible');
-      renderLinkTable();
-    });
+    document.getElementById('searchInput').addEventListener('input', renderLinkTable);
 
     function copyLink(url, id) {
       navigator.clipboard.writeText(url).then(() => {
@@ -184,12 +159,13 @@
         if (btn) {
           const original = btn.textContent;
           btn.textContent = 'Copied!';
-          btn.style.background = 'var(--gold-dim)';
-          btn.style.color = 'var(--gold)';
-          btn.style.borderColor = 'var(--gold)';
-          setTimeout(() => { btn.textContent = original; btn.style = ''; }, 2000);
+          btn.classList.add('btn-action--copied');
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.remove('btn-action--copied');
+          }, 2000);
         }
-      }).catch(() => showErr('Failed to copy link'));
+      }).catch(() => showToast('Failed to copy link', 'error'));
     }
 
     loadLinks();
