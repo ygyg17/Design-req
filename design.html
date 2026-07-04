@@ -16,7 +16,7 @@
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
                  font-src https://fonts.gstatic.com;
                  img-src 'self' data: https://cdn-5d8995b3f911c90950a6130b.closte.com;
-                 connect-src 'self' https://script.google.com https://script.googleusercontent.com;
+                 connect-src 'self' https://guobvhghlrlgcqbfgzdn.supabase.co;
                  frame-ancestors 'none';">
 
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -103,7 +103,6 @@
       border-radius: 99px;
       transition: width 0.3s ease;
     }
-    /* subtle shimmer while in indeterminate/simulated phase, signals "still working" */
     .upload-progress-bar-fill.simulating {
       background-image: linear-gradient(
         90deg,
@@ -283,6 +282,12 @@
 
   <script src="config.js"></script>
   <script>
+
+    // DESIGN_API_URL: tambahkan key ini ke SUPABASE_CONFIG di config.js, contoh:
+    //   DESIGN_API_URL: 'https://guobvhghlrlgcqbfgzdn.supabase.co/functions/v1/design-request-api'
+    // Fallback dibuat di bawah supaya tidak crash kalau config.js belum di-update.
+    const DESIGN_API_URL = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.DESIGN_API_URL)
+      || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.URL + '/functions/v1/design-request-api');
 
     const SECURITY = {
       MAX_FILE_SIZE_MB   : 20,
@@ -590,14 +595,11 @@
     /*
      * SIMULATED UPLOAD PROGRESS
      * ------------------------------------------------------------
-     * Apps Script web apps don't expose real upload progress to fetch(),
-     * and attaching XHR's upload.onprogress listener triggers a CORS
-     * preflight that Apps Script can't answer correctly, breaking the
-     * request entirely. So instead of real byte-level progress, we
-     * animate the bar smoothly from a starting point up to a ceiling
-     * (never 100%) while the request is in flight, then snap to 100%
-     * once the response actually comes back. This keeps the UI
-     * communicative without lying about precision it doesn't have.
+     * Sama seperti sebelumnya di versi Apps Script: fetch() ke Edge
+     * Function juga tidak memberi byte-level progress event, jadi kita
+     * tetap animasikan progress bar dari titik awal ke ceiling (belum
+     * 100%) selama request berjalan, lalu snap ke 100% saat respons
+     * benar-benar diterima.
      */
     function startSimulatedProgress(label, { from = 0, ceiling = 92, durationMs = 6000 } = {}) {
       progressWrap.classList.add('visible');
@@ -612,7 +614,6 @@
         if (stopped) return;
         if (start === null) start = ts;
         const elapsed = ts - start;
-        // ease-out curve: fast at first, slows as it approaches the ceiling
         const t = Math.min(1, elapsed / durationMs);
         const eased = 1 - Math.pow(1 - t, 3);
         const pct = from + (ceiling - from) * eased;
@@ -723,6 +724,7 @@
         }
 
         const payload = {
+          action     : 'submit',
           email      : sanitizeEmail(document.getElementById('email').value.trim()),
           name       : sanitizeText(document.getElementById('name').value.trim()),
           department : document.getElementById('department').value,
@@ -736,12 +738,8 @@
 
         RateLimiter.record();
 
-        // Reading is done (files are in memory as base64), now the actual
-        // network request begins. Real byte-level progress isn't available
-        // here (see comment above), so we animate a believable progress
-        // bar while the request is in flight and snap to 100% on response.
         const totalBytes = selectedFiles.reduce((sum, f) => sum + f.size, 0);
-        const estDurationMs = Math.min(15000, Math.max(2500, totalBytes / 50000)); // rough heuristic, capped
+        const estDurationMs = Math.min(15000, Math.max(2500, totalBytes / 50000));
 
         simProgress = startSimulatedProgress('Uploading to server…', {
           from: 0,
@@ -749,14 +747,23 @@
           durationMs: estDurationMs
         });
 
-        await fetch(CONFIG.GAS_WEB_APP_URL, {
+        const res = await fetch(DESIGN_API_URL, {
           method  : 'POST',
           body    : JSON.stringify(payload),
-          headers : { 'Content-Type': 'text/plain;charset=utf-8' }
+          headers : {
+            'Content-Type': 'application/json',
+            'apikey': window.SUPABASE_CONFIG.ANON_KEY
+          }
         });
 
+        const result = await res.json().catch(() => ({}));
+
+        if (!res.ok || result.status === 'error') {
+          throw new Error(result.message || 'Submission failed');
+        }
+
         simProgress.finish('Upload complete!');
-        await new Promise(r => setTimeout(r, 400)); // let the user see 100%
+        await new Promise(r => setTimeout(r, 400));
         hideProgress();
 
         showToast('✓ Request submitted successfully!', 'success');
