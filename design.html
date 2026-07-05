@@ -283,11 +283,9 @@
   <script src="config.js"></script>
   <script>
 
-    // DESIGN_API_URL: tambahkan key ini ke SUPABASE_CONFIG di config.js, contoh:
-    //   DESIGN_API_URL: 'https://guobvhghlrlgcqbfgzdn.supabase.co/functions/v1/design-request-api'
-    // Fallback dibuat di bawah supaya tidak crash kalau config.js belum di-update.
-    const DESIGN_API_URL = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.DESIGN_API_URL)
-      || (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.URL + '/functions/v1/design-request-api');
+    const DESIGN_CONFIG = window.SUPABASE_CONFIG || {};
+    const DESIGN_API_URL = DESIGN_CONFIG.DESIGN_API_URL
+      || (DESIGN_CONFIG.URL && DESIGN_CONFIG.URL + '/functions/v1/design-request-api');
 
     const SECURITY = {
       MAX_FILE_SIZE_MB   : 20,
@@ -669,7 +667,6 @@
 
     document.getElementById('formTimestamp').value = Date.now();
 
-    try { sessionStorage.removeItem('ts_submit_log'); } catch {}
     document.getElementById('rateWarning').classList.remove('visible');
     document.getElementById('submitBtn').disabled = false;
 
@@ -695,6 +692,11 @@
       }
 
       if (!validate()) return;
+
+      if (!DESIGN_API_URL || !DESIGN_CONFIG.ANON_KEY) {
+        showToast('✕ Supabase config is missing. Please contact Marketing.', 'error');
+        return;
+      }
 
       const btn     = document.getElementById('submitBtn');
       const btnText = document.getElementById('btnText');
@@ -752,7 +754,7 @@
           body    : JSON.stringify(payload),
           headers : {
             'Content-Type': 'application/json',
-            'apikey': window.SUPABASE_CONFIG.ANON_KEY
+            'apikey': DESIGN_CONFIG.ANON_KEY
           }
         });
 

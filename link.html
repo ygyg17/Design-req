@@ -352,7 +352,7 @@
     </div>
 
     <div class="config-banner" id="configBanner">
-      ⚠ Supabase belum dikonfigurasi. Buka <code>config.js</code> dan isi <code>SUPABASE_CONFIG.URL</code> dan <code>SUPABASE_CONFIG.ANON_KEY</code>.
+      ⚠ Supabase belum siap. Cek koneksi, CDN Supabase, atau isi <code>SUPABASE_CONFIG.URL</code> dan <code>SUPABASE_CONFIG.ANON_KEY</code> di <code>config.js</code>.
     </div>
 
     <div class="filter-bar" id="filterBar">
@@ -395,10 +395,14 @@
     setInterval(updateClock, 1000);
 
     // ── SUPABASE CLIENT (read-only, RLS mengizinkan SELECT publik) ──
-    const sbLink = supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
+    const LINK_CONFIG = window.SUPABASE_CONFIG || {};
+    const hasSupabaseClient = !!(window.supabase && LINK_CONFIG.URL && LINK_CONFIG.ANON_KEY && LINK_CONFIG.URL.indexOf('PASTE_YOUR') === -1);
+    const sbLink = hasSupabaseClient
+      ? window.supabase.createClient(LINK_CONFIG.URL, LINK_CONFIG.ANON_KEY)
+      : null;
 
     // ── CONFIG CHECK ──
-    if (!SUPABASE_CONFIG.URL || !SUPABASE_CONFIG.ANON_KEY || SUPABASE_CONFIG.URL.indexOf('PASTE_YOUR') !== -1) {
+    if (!hasSupabaseClient) {
       document.getElementById('configBanner').style.display = 'block';
     }
 
@@ -408,6 +412,11 @@
 
     // ── LOAD LINKS ──
     async function loadLinks() {
+      if (!sbLink) {
+        document.getElementById('linkList').innerHTML = '<div class="empty-state">Gagal memuat Supabase. Silakan refresh halaman atau cek konfigurasi.</div>';
+        return;
+      }
+
       const { data, error } = await sbLink
         .from('links')
         .select('id, name, url, category')
