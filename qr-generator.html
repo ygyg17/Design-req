@@ -35,46 +35,116 @@
       text-decoration: underline;
     }
 
-    .qr-color-row {
+    .qr-color-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 14px;
     }
 
-    .qr-color-box {
-      background: var(--surface-raised, #f9fafb);
+    .qr-color-field {
       border: 1.5px solid var(--border, #e5e7eb);
       border-radius: var(--radius, 14px);
-      padding: 14px;
+      padding: 12px;
+      background: var(--surface-raised, #f9fafb);
     }
 
-    .qr-color-box label {
-      margin-bottom: 10px;
+    .qr-color-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted, #6b7280);
+      margin-bottom: 8px;
     }
 
-    input[type="color"] {
-      width: 100%;
-      height: 46px;
-      border: 1.5px solid var(--border, #e5e7eb);
-      border-radius: var(--radius-sm, 10px);
-      background: var(--surface, #ffffff);
+    .qr-color-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qr-color-control input[type="color"] {
+      width: 42px;
+      min-width: 42px;
+      height: 40px;
+      padding: 3px;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px;
+      background: #fff;
       cursor: pointer;
-      padding: 4px;
+    }
+
+    .qr-color-control input[type="text"] {
+      width: 100%;
+      height: 40px;
+      padding: 0 10px;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      background: var(--surface, #ffffff);
+      color: var(--text, #111827);
+      outline: none;
+    }
+
+    .qr-color-control input[type="text"]:focus {
+      border-color: var(--gold, #BA8F2E);
+      box-shadow: 0 0 0 3px rgba(186, 143, 46, 0.12);
+    }
+
+    .qr-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 12px;
+      border: 1.5px solid var(--border, #e5e7eb);
+      border-radius: var(--radius, 14px);
+      background: var(--surface-raised, #f9fafb);
+    }
+
+    .qr-checkbox input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--gold, #BA8F2E);
+      cursor: pointer;
+    }
+
+    .qr-checkbox span {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text, #111827);
+    }
+
+    .qr-checkbox small {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted, #6b7280);
+      margin-top: 2px;
     }
 
     .qr-preview-box {
       margin-top: 28px;
       padding: 24px;
       border-radius: var(--radius-lg, 20px);
-      background: var(--surface-raised, #f9fafb);
       border: 1.5px dashed var(--border, #e5e7eb);
       text-align: center;
-      min-height: 180px;
+      min-height: 190px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 14px;
+      background:
+        linear-gradient(45deg, #eeeeee 25%, transparent 25%),
+        linear-gradient(-45deg, #eeeeee 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #eeeeee 75%),
+        linear-gradient(-45deg, transparent 75%, #eeeeee 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      background-color: #ffffff;
     }
 
     .qr-preview-box canvas {
@@ -122,6 +192,11 @@
       color: #15803d;
     }
 
+    .qr-color-field.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
     #toast {
       position: fixed;
       left: 50%;
@@ -154,9 +229,8 @@
     }
 
     @media (max-width: 720px) {
-      .qr-color-row {
+      .qr-color-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
       }
 
       .qr-preview-box {
@@ -193,21 +267,21 @@
       </div>
 
       <div class="notice">
-        Masukkan link atau teks, pilih warna QR dan background, lalu download hasilnya dalam format PNG.
+        Enter your link or text, customize the colors, then download the QR code as a PNG file.
       </div>
 
       <div class="form-group">
-        <label for="qrText">Link atau Teks <span class="req">*</span></label>
+        <label for="qrText">Link or Text <span class="req">*</span></label>
         <textarea
           id="qrText"
           rows="4"
-          placeholder="Contoh: https://forms.gle/7H32KvAJ279XRCuTA"
+          placeholder="Example: https://forms.gle/7H32KvAJ279XRCuTA"
         ></textarea>
         <span class="field-error" id="qrTextError"></span>
       </div>
 
       <div class="form-group">
-        <label for="qrSize">Ukuran QR Code</label>
+        <label for="qrSize">QR Code Size</label>
 
         <div class="select-wrapper">
           <select id="qrSize">
@@ -220,19 +294,35 @@
       </div>
 
       <div class="form-group">
-        <label>Pilihan Warna</label>
+        <label>Color Settings</label>
 
-        <div class="qr-color-row">
-          <div class="qr-color-box">
-            <label for="qrColor">Warna QR</label>
-            <input type="color" id="qrColor" value="#BA8F2E">
+        <div class="qr-color-grid">
+          <div class="qr-color-field">
+            <span class="qr-color-label">QR Color</span>
+
+            <div class="qr-color-control">
+              <input type="color" id="qrColorPicker" value="#BA8F2E">
+              <input type="text" id="qrColorCode" value="#BA8F2E" maxlength="7" placeholder="#BA8F2E">
+            </div>
           </div>
 
-          <div class="qr-color-box">
-            <label for="bgColor">Warna Background</label>
-            <input type="color" id="bgColor" value="#ffffff">
+          <div class="qr-color-field" id="bgColorField">
+            <span class="qr-color-label">Background Color</span>
+
+            <div class="qr-color-control">
+              <input type="color" id="bgColorPicker" value="#FFFFFF">
+              <input type="text" id="bgColorCode" value="#FFFFFF" maxlength="7" placeholder="#FFFFFF">
+            </div>
           </div>
         </div>
+
+        <label class="qr-checkbox" for="transparentBg">
+          <input type="checkbox" id="transparentBg">
+          <span>
+            Transparent Background
+            <small>Use this for PNG files without a background color.</small>
+          </span>
+        </label>
       </div>
 
       <button type="button" id="generateBtn">
@@ -245,7 +335,7 @@
 
       <div class="qr-preview-box">
         <p class="qr-empty-text" id="qrEmptyText">
-          QR Code preview akan muncul di sini.
+          QR code preview will appear here.
         </p>
 
         <canvas id="qrCanvas" style="display:none;"></canvas>
@@ -347,11 +437,71 @@
       return qrLibraryPromise;
     }
 
+    function isValidHexColor(value) {
+      return /^#([0-9A-Fa-f]{6})$/.test(value);
+    }
+
+    function normalizeHex(value) {
+      let color = value.trim();
+
+      if (!color.startsWith("#")) {
+        color = "#" + color;
+      }
+
+      return color.toUpperCase();
+    }
+
+    function syncColorInputs(pickerId, codeId) {
+      const picker = document.getElementById(pickerId);
+      const code = document.getElementById(codeId);
+
+      picker.addEventListener("input", function () {
+        code.value = picker.value.toUpperCase();
+      });
+
+      code.addEventListener("input", function () {
+        let value = normalizeHex(code.value);
+
+        code.value = value;
+
+        if (isValidHexColor(value)) {
+          picker.value = value;
+        }
+      });
+
+      code.addEventListener("blur", function () {
+        let value = normalizeHex(code.value);
+
+        if (!isValidHexColor(value)) {
+          value = picker.value.toUpperCase();
+          code.value = value;
+          showToast("Please enter a valid hex color code.", "error");
+          return;
+        }
+
+        code.value = value;
+        picker.value = value;
+      });
+    }
+
+    function updateTransparentBackgroundUI() {
+      const transparentBg = document.getElementById("transparentBg");
+      const bgColorField = document.getElementById("bgColorField");
+
+      if (transparentBg.checked) {
+        bgColorField.classList.add("disabled");
+      } else {
+        bgColorField.classList.remove("disabled");
+      }
+    }
+
     async function generateQR() {
       const textInput = document.getElementById("qrText");
       const sizeInput = document.getElementById("qrSize");
-      const qrColorInput = document.getElementById("qrColor");
-      const bgColorInput = document.getElementById("bgColor");
+
+      const qrColorCode = document.getElementById("qrColorCode");
+      const bgColorCode = document.getElementById("bgColorCode");
+      const transparentBg = document.getElementById("transparentBg");
 
       const canvas = document.getElementById("qrCanvas");
       const downloadBtn = document.getElementById("downloadBtn");
@@ -361,14 +511,25 @@
 
       const text = textInput.value.trim();
       const size = Number(sizeInput.value);
-      const qrColor = qrColorInput.value;
-      const bgColor = bgColorInput.value;
+
+      const qrColor = normalizeHex(qrColorCode.value);
+      const bgColor = transparentBg.checked ? "#0000" : normalizeHex(bgColorCode.value);
 
       errorText.textContent = "";
 
       if (!text) {
-        errorText.textContent = "Masukkan link atau teks terlebih dahulu.";
-        showToast("Link atau teks belum diisi.", "error");
+        errorText.textContent = "Please enter a link or text first.";
+        showToast("Link or text is required.", "error");
+        return;
+      }
+
+      if (!isValidHexColor(qrColor)) {
+        showToast("Please enter a valid QR color code.", "error");
+        return;
+      }
+
+      if (!transparentBg.checked && !isValidHexColor(bgColor)) {
+        showToast("Please enter a valid background color code.", "error");
         return;
       }
 
@@ -393,8 +554,8 @@
 
           if (error) {
             console.error(error);
-            setLibraryStatus("QR Code gagal dibuat.", "error");
-            showToast("QR Code gagal dibuat.", "error");
+            setLibraryStatus("Failed to generate QR code.", "error");
+            showToast("Failed to generate QR code.", "error");
             return;
           }
 
@@ -406,8 +567,8 @@
           downloadBtn.href = imageUrl;
           downloadBtn.style.display = "inline-block";
 
-          setLibraryStatus("QR Code berhasil dibuat.", "success");
-          showToast("QR Code berhasil dibuat.", "success");
+          setLibraryStatus("QR code generated successfully.", "success");
+          showToast("QR code generated successfully.", "success");
         });
 
       } catch (error) {
@@ -416,22 +577,29 @@
         generateBtn.disabled = false;
         generateBtn.textContent = "Generate QR Code";
 
-        setLibraryStatus("Library QR Code gagal dimuat. Cek koneksi internet atau CDN.", "error");
-        showToast("Library QR Code gagal dimuat.", "error");
+        setLibraryStatus("QR library failed to load. Please check your connection.", "error");
+        showToast("QR library failed to load.", "error");
       }
     }
 
     document.addEventListener("DOMContentLoaded", async function () {
       const generateBtn = document.getElementById("generateBtn");
+      const transparentBg = document.getElementById("transparentBg");
 
       generateBtn.addEventListener("click", generateQR);
+
+      syncColorInputs("qrColorPicker", "qrColorCode");
+      syncColorInputs("bgColorPicker", "bgColorCode");
+
+      transparentBg.addEventListener("change", updateTransparentBackgroundUI);
+      updateTransparentBackgroundUI();
 
       try {
         await ensureQRCodeLibrary();
         setLibraryStatus("QR library ready.", "success");
       } catch (error) {
         console.error(error);
-        setLibraryStatus("QR library belum termuat. Tombol generate akan mencoba memuat ulang.", "error");
+        setLibraryStatus("QR library is not loaded yet. The button will try to load it again.", "error");
       }
     });
   </script>
