@@ -64,9 +64,14 @@
       if (offset > cursor) container.appendChild(document.createTextNode(text.slice(cursor, offset)));
 
       if (token.startsWith('**') && token.endsWith('**')) {
-        const strong = document.createElement('strong');
-        appendInlineContent(strong, token.slice(2, -2));
-        container.appendChild(strong);
+        const boldText = token.slice(2, -2);
+        if (/^(https?:\/\/[^\s<>]+|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,})$/.test(boldText.trim())) {
+          appendInlineContent(container, boldText);
+        } else {
+          const strong = document.createElement('strong');
+          appendInlineContent(strong, boldText);
+          container.appendChild(strong);
+        }
       } else {
         const trailing = token.match(/[.,!?;:)]+$/)?.[0] || '';
         const value = trailing ? token.slice(0, -trailing.length) : token;
