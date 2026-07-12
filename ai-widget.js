@@ -184,7 +184,7 @@
       if (!response.ok) throw new Error(result.error || 'The assistant is temporarily unavailable.');
 
       const answer = String(result.answer || '').trim();
-      if (!answer) throw new Error('The assistant returned an empty response.');
+      if (!answer) throw new Error('Sorry, I could not generate a reply just now. Please try again in a moment.');
       typing.remove();
       addMessage('assistant', answer);
       messages.push({ role: 'assistant', content: answer });
