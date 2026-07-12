@@ -65,7 +65,7 @@
 
       if (token.startsWith('**') && token.endsWith('**')) {
         const strong = document.createElement('strong');
-        strong.textContent = token.slice(2, -2);
+        appendInlineContent(strong, token.slice(2, -2));
         container.appendChild(strong);
       } else {
         const trailing = token.match(/[.,!?;:)]+$/)?.[0] || '';
