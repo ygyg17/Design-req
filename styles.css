@@ -91,6 +91,37 @@ header {
   flex-shrink: 0;
 }
 
+.header-home-link {
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--gold);
+  background: var(--gold-tint);
+  border: 1px solid rgba(186, 143, 46, 0.28);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.header-home-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+.header-home-link:hover {
+  color: #fff;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.header-home-link:focus-visible {
+  outline: 3px solid var(--gold-shadow);
+  outline-offset: 2px;
+}
+
 .brand-block {
   display: flex;
   flex-direction: column;
@@ -1164,6 +1195,7 @@ tbody tr:hover { background: var(--surface-raised); }
 @media (max-width: 480px) {
   main { padding: 24px 14px; }
   .header-content img { width: 38px; height: 38px; }
+  .header-home-link { width: 38px; height: 38px; }
   .brand-name { font-size: 15px; }
   footer { flex-direction: column; gap: 6px; }
 }
