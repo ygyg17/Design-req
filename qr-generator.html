@@ -397,11 +397,8 @@
       if (!status) return;
 
       status.textContent = message;
-      status.className = "qr-status";
-
-      if (type) {
-        status.classList.add(type);
-      }
+      status.className = "qr-status"; // reset base class
+      if (type) status.classList.add(type);
     }
 
     function loadScript(src) {
@@ -417,41 +414,63 @@
         script.src = src;
         script.async = true;
 
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("Failed to load: " + src));
+        // Set timeout to handle network failure / slow connection
+        const timeoutId = setTimeout(() => {
+          script.onerror = null;
+          script.onload = null;
+          script.remove();
+          reject(new Error("Timeout loading script: " + src));
+        }, 12000);
+
+        script.onload = () => {
+          clearTimeout(timeoutId);
+          resolve();
+        };
+        script.onerror = () => {
+          clearTimeout(timeoutId);
+          reject(new Error("Failed to load: " + src));
+        };
 
         document.head.appendChild(script);
       });
     }
 
     async function ensureQRCodeLibrary() {
-      if (typeof QRCode !== "undefined") {
-        return true;
-      }
-
-      if (qrLibraryPromise) {
-        return qrLibraryPromise;
-      }
-
-      qrLibraryPromise = new Promise(async (resolve, reject) => {
-        for (const cdn of QR_CDN_LIST) {
-          try {
-            await loadScript(cdn);
-
-            if (typeof QRCode !== "undefined") {
-              resolve(true);
-              return;
-            }
-          } catch (error) {
-            console.warn(error.message);
+          if (typeof QRCode !== "undefined") {
+            return true;
           }
+
+          // If there's a cached promise, wait for it
+          if (qrLibraryPromise) {
+            try {
+              return await qrLibraryPromise;
+            } catch (e) {
+              // If previous attempt failed, clear the cache so we can retry
+              qrLibraryPromise = null;
+            }
+          }
+
+          qrLibraryPromise = new Promise(async (resolve, reject) => {
+            for (const cdn of QR_CDN_LIST) {
+              try {
+                await loadScript(cdn);
+
+                if (typeof QRCode !== "undefined") {
+                  resolve(true);
+                  return;
+                }
+              } catch (error) {
+                console.warn(error.message);
+              }
+            }
+
+            // Clear promise on failure so future calls can retry
+            qrLibraryPromise = null;
+            reject(new Error("QRCode library could not be loaded from all CDN sources."));
+          });
+
+          return qrLibraryPromise;
         }
-
-        reject(new Error("QRCode library could not be loaded from all CDN sources."));
-      });
-
-      return qrLibraryPromise;
-    }
 
     function isValidHexColor(value) {
       return /^#([0-9A-Fa-f]{6})$/.test(value);
@@ -529,7 +548,7 @@
       const size = Number(sizeInput.value);
 
       const qrColor = normalizeHex(qrColorCode.value);
-      const bgColor = transparentBg.checked ? "#0000" : normalizeHex(bgColorCode.value);
+      const bgColor = transparentBg.checked ? "rgba(0,0,0,0)" : normalizeHex(bgColorCode.value);
 
       errorText.textContent = "";
 
