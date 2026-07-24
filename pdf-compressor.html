@@ -309,17 +309,17 @@
     }
 
     function isPdfFile(file) {
-      if (!file) {
-        return false;
-      }
+      // Validate that the file is a genuine PDF.
+      // We check for PDF extension AND PDF MIME type if available.
+      if (!file) return false;
 
-      const hasPdfMimeType =
-        file.type === 'application/pdf';
+      const extensionIsPdf = file.name.toLowerCase().endsWith('.pdf');
+      const mimeIsPdf = file.type && file.type.toLowerCase() === 'application/pdf';
 
-      const hasPdfExtension =
-        file.name.toLowerCase().endsWith('.pdf');
-
-      return hasPdfMimeType || hasPdfExtension;
+      // Both checks must pass for a stricter validation.
+      // If MIME is provided, it MUST be application/pdf.
+      // If MIME is missing, fallback to extension check (browser limitation).
+      return file.type ? mimeIsPdf : extensionIsPdf;
     }
 
     function setSelectedFile(file) {
