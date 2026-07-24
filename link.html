@@ -392,18 +392,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="config.js"></script>
   <script>
-    // ── CLOCK ──
-    function updateClock() {
-      const now = new Date();
-      const dateEl = document.getElementById('clock-date');
-      const timeEl = document.getElementById('clock-time');
-      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      dateEl.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-      timeEl.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+    /* ── CLOCK ──
+    // Clock removed
+    */
 
     // ── SUPABASE CLIENT (read-only, RLS mengizinkan SELECT publik) ──
     const LINK_CONFIG = window.SUPABASE_CONFIG || {};
