@@ -52,7 +52,6 @@
     .header-home-link {
       width: 38px;
       height: 38px;
-      margin-left: 6px;
       display: grid;
       place-items: center;
       flex-shrink: 0;
@@ -339,20 +338,22 @@
   <header>
     <div class="header-left">
       <img src="images/Logo.png"
-           alt="The Seminyak Logo">
+           alt="The Seminyak"
+           style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
 
       <div class="brand-block">
         <span class="brand-eyebrow">The Seminyak</span>
         <span class="brand-name">Link Bank</span>
       </div>
-      <a href="index.html" class="header-home-link" aria-label="Back to Home" title="Back to Home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m3 11 9-8 9 8"/>
-          <path d="M5 10v10h14V10"/>
-          <path d="M9 20v-6h6v6"/>
-        </svg>
-      </a>
     </div>
+
+    <a href="index.html" class="header-home-link" aria-label="Back to Home" title="Back to Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m3 11 9-8 9 8"/>
+        <path d="M5 10v10h14V10"/>
+        <path d="M9 20v-6h6v6"/>
+      </svg>
+    </a>
   </header>
 
   <main>
