@@ -371,8 +371,6 @@
 
   <script>
     const QR_CDN_LIST = [
-      "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js",
-      "https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js",
       "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js",
       "https://unpkg.com/qrcode/build/qrcode.min.js"
     ];
@@ -428,6 +426,7 @@
         };
         script.onerror = () => {
           clearTimeout(timeoutId);
+          script.remove();
           reject(new Error("Failed to load: " + src));
         };
 
@@ -522,12 +521,19 @@
     function updateTransparentBackgroundUI() {
       const transparentBg = document.getElementById("transparentBg");
       const bgColorField = document.getElementById("bgColorField");
+      const bgColorPicker = document.getElementById("bgColorPicker");
+      const bgColorCode = document.getElementById("bgColorCode");
+      const isTransparent = transparentBg.checked;
 
-      if (transparentBg.checked) {
+      if (isTransparent) {
         bgColorField.classList.add("disabled");
       } else {
         bgColorField.classList.remove("disabled");
       }
+
+      bgColorField.setAttribute("aria-disabled", String(isTransparent));
+      bgColorPicker.disabled = isTransparent;
+      bgColorCode.disabled = isTransparent;
     }
 
     async function generateQR() {
@@ -548,7 +554,7 @@
       const size = Number(sizeInput.value);
 
       const qrColor = normalizeHex(qrColorCode.value);
-      const bgColor = transparentBg.checked ? "rgba(0,0,0,0)" : normalizeHex(bgColorCode.value);
+      const bgColor = transparentBg.checked ? "#0000" : normalizeHex(bgColorCode.value);
 
       errorText.textContent = "";
 
