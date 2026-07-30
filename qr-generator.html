@@ -5,14 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>QR Code Generator - Marketing The Seminyak</title>
-
-  <!-- Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Main website style -->
-  <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css">
 
   <style>
     .qr-card {
@@ -395,7 +391,7 @@
       if (!status) return;
 
       status.textContent = message;
-      status.className = "qr-status"; // reset base class
+      status.className = "qr-status";
       if (type) status.classList.add(type);
     }
 
@@ -412,7 +408,6 @@
         script.src = src;
         script.async = true;
 
-        // Set timeout to handle network failure / slow connection
         const timeoutId = setTimeout(() => {
           script.onerror = null;
           script.onload = null;
@@ -439,12 +434,10 @@
             return true;
           }
 
-          // If there's a cached promise, wait for it
           if (qrLibraryPromise) {
             try {
               return await qrLibraryPromise;
             } catch (e) {
-              // If previous attempt failed, clear the cache so we can retry
               qrLibraryPromise = null;
             }
           }
@@ -463,7 +456,6 @@
               }
             }
 
-            // Clear promise on failure so future calls can retry
             qrLibraryPromise = null;
             reject(new Error("QRCode library could not be loaded from all CDN sources."));
           });

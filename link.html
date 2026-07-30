@@ -31,9 +31,7 @@
       display: flex;
       flex-direction: column;
     }
-
-    /* ── HEADER ── */
-    header {
+header {
       background: var(--surface);
       border-bottom: 1px solid var(--line);
       padding: 14px 24px;
@@ -109,9 +107,7 @@
 
     #clock-date { font-weight: 500; }
     #clock-time { font-size: 14px; color: var(--color-brand); font-weight: 700; }
-
-    /* ── MAIN ── */
-    main {
+main {
       flex: 1;
       max-width: 780px;
       width: 100%;
@@ -137,9 +133,7 @@
       line-height: 1.6;
       max-width: 520px;
     }
-
-    /* ── CONFIG BANNER ── */
-    .config-banner {
+.config-banner {
       background: #fef2f2;
       border: 1px solid #fecaca;
       color: #991b1b;
@@ -155,9 +149,7 @@
       border-radius: 4px;
       font-family: 'JetBrains Mono', monospace;
     }
-
-    /* ── FILTER TABS ── */
-    .filter-bar {
+.filter-bar {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -205,9 +197,7 @@
       border-color: var(--color-brand);
       color: #fff;
     }
-
-    /* ── LINK LIST ── */
-    .link-list { display: flex; flex-direction: column; gap: 8px; }
+.link-list { display: flex; flex-direction: column; gap: 8px; }
 
     .link-card {
       background: var(--surface);
@@ -277,13 +267,9 @@
 
     .btn-action.copy:hover { background: var(--color-brand-hover); border-color: var(--color-brand-hover); }
     .btn-action.copy.copied { background: var(--color-success); border-color: var(--color-success); }
-
-    /* ── EMPTY STATE ── */
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
     .empty-state svg { opacity: 0.3; margin-bottom: 12px; }
-
-    /* ── LOADING ── */
-    .skeleton { display: flex; flex-direction: column; gap: 8px; }
+.skeleton { display: flex; flex-direction: column; gap: 8px; }
     .skeleton-row {
       height: 52px;
       border-radius: 10px;
@@ -292,9 +278,7 @@
       animation: shimmer 1.4s infinite;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-    /* ── TOAST ── */
-    #toast {
+#toast {
       position: fixed;
       bottom: 24px;
       left: 50%;
@@ -312,9 +296,7 @@
       white-space: nowrap;
     }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    /* ── FOOTER ── */
-    footer {
+footer {
       text-align: center;
       padding: 20px;
       font-size: 12px;
@@ -323,9 +305,7 @@
     }
     footer a { color: var(--color-brand); text-decoration: none; font-weight: 500; }
     footer a:hover { text-decoration: underline; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 480px) {
+@media (max-width: 480px) {
       .link-card { flex-wrap: nowrap; gap: 8px; }
       .link-name { font-size: 13px; flex: 1; min-width: 0; }
       .link-category-badge { display: none !important; }
@@ -392,27 +372,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="config.js"></script>
   <script>
-    /* ── CLOCK ──
-    // Clock removed
-    */
-
-    // ── SUPABASE CLIENT (read-only, RLS mengizinkan SELECT publik) ──
     const LINK_CONFIG = window.SUPABASE_CONFIG || {};
     const hasSupabaseClient = !!(window.supabase && LINK_CONFIG.URL && LINK_CONFIG.ANON_KEY && LINK_CONFIG.URL.indexOf('PASTE_YOUR') === -1);
     const sbLink = hasSupabaseClient
       ? window.supabase.createClient(LINK_CONFIG.URL, LINK_CONFIG.ANON_KEY)
       : null;
 
-    // ── CONFIG CHECK ──
     if (!hasSupabaseClient) {
       document.getElementById('configBanner').style.display = 'block';
     }
 
-    // ── STATE ──
     let allLinks = [];
     let activeCategory = 'All';
 
-    // ── LOAD LINKS ──
     async function loadLinks() {
       if (!sbLink) {
         document.getElementById('linkList').innerHTML = '<div class="empty-state">Gagal memuat Supabase. Silakan refresh halaman atau cek konfigurasi.</div>';
@@ -431,7 +403,6 @@
         return;
       }
 
-      // Normalisasi field `url` → `link` biar sisa kode di bawah tidak perlu diubah
       allLinks = (data || []).map(item => ({ id: item.id, name: item.name, link: item.url, category: item.category }));
       renderLinks(allLinks, activeCategory === 'All');
     }
@@ -441,7 +412,6 @@
       const searchBox = filterBar.querySelector('.search-box');
       const defaultCats = ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
 
-      // Gabungkan kategori default dengan kategori yang benar-benar ada di data
       const foundCats = [...new Set(allLinks.map(l => l.category))];
       const categoryList = [...new Set([...defaultCats, ...foundCats])];
 
@@ -457,7 +427,6 @@
       });
     }
 
-    // ── FILTER ──
     function filterLinks(category){
       activeCategory = category;
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -473,7 +442,6 @@
       renderLinks(filtered, activeCategory === 'All');
     }
 
-    // ── RENDER ──
     function renderLinks(links, showBadge) {
       const container = document.getElementById('linkList');
       if (!links.length) {
@@ -502,10 +470,8 @@
       container.innerHTML = `<div class="link-list">${html}</div>`;
     }
 
-    // ── OPEN LINK ──
     function openLink(url) { window.open(url, '_blank', 'noopener,noreferrer'); }
 
-    // ── COPY LINK ──
     function copyLink(url, id) {
       navigator.clipboard.writeText(url).then(function() {
         const btn = document.getElementById('copy-' + id);
@@ -526,7 +492,6 @@
       });
     }
 
-    // ── TOAST ──
     function showToast(msg) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -534,13 +499,11 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // ── ESCAPE HELPERS ──
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
     function escAttr(str) { return String(str).replace(/'/g, "\\'"); }
 
-    // ── INIT ──
     (async function init() {
       await loadLinks();
       loadCategories();

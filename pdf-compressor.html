@@ -192,12 +192,8 @@
   </footer>
 
   <div id="toast"></div>
-
-  <!-- PDF.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
     const pdfInput = document.getElementById('pdfFile');
@@ -218,12 +214,7 @@
 
     let currentDownloadUrl = null;
     let isProcessing = false;
-
-    /*
-     * PDF.js menggunakan sekitar 72 unit per inch.
-     * Scale = target DPI / 72.
-     */
-    const presets = {
+const presets = {
       low: {
         dpi: 300,
         quality: 0.92,
@@ -309,16 +300,11 @@
     }
 
     function isPdfFile(file) {
-      // Validate that the file is a genuine PDF.
-      // We check for PDF extension AND PDF MIME type if available.
       if (!file) return false;
 
       const extensionIsPdf = file.name.toLowerCase().endsWith('.pdf');
       const mimeIsPdf = file.type && file.type.toLowerCase() === 'application/pdf';
 
-      // Both checks must pass for a stricter validation.
-      // If MIME is provided, it MUST be application/pdf.
-      // If MIME is missing, fallback to extension check (browser limitation).
       return file.type ? mimeIsPdf : extensionIsPdf;
     }
 
@@ -373,12 +359,7 @@
 
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
-
-      /*
-       * Memberikan background putih untuk menghindari
-       * background transparan berubah menjadi hitam.
-       */
-      context.save();
+context.save();
       context.fillStyle = '#ffffff';
       context.fillRect(
         0,
@@ -503,23 +484,13 @@
         ) {
           statusText.textContent =
             `Processing page ${pageNumber} of ${sourcePdf.numPages}...`;
-
-          /*
-           * Beri kesempatan browser memperbarui UI
-           * sebelum memproses halaman berikutnya.
-           */
-          await new Promise(resolve => {
+await new Promise(resolve => {
             window.requestAnimationFrame(resolve);
           });
 
           const page =
             await sourcePdf.getPage(pageNumber);
-
-          /*
-           * Viewport skala 1 digunakan sebagai ukuran fisik
-           * halaman PDF dalam point.
-           */
-          const originalViewport =
+const originalViewport =
             page.getViewport({ scale: 1 });
 
           const pageWidth =
@@ -566,11 +537,7 @@
             undefined,
             preset.compression
           );
-
-          /*
-           * Bersihkan memori setelah setiap halaman.
-           */
-          page.cleanup();
+page.cleanup();
 
           canvas.width = 1;
           canvas.height = 1;

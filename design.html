@@ -596,17 +596,7 @@
       progressBar.style.width = '0%';
       progressPct.textContent = '0%';
     }
-
-    /*
-     * SIMULATED UPLOAD PROGRESS
-     * ------------------------------------------------------------
-     * Sama seperti sebelumnya di versi Apps Script: fetch() ke Edge
-     * Function juga tidak memberi byte-level progress event, jadi kita
-     * tetap animasikan progress bar dari titik awal ke ceiling (belum
-     * 100%) selama request berjalan, lalu snap ke 100% saat respons
-     * benar-benar diterima.
-     */
-    function startSimulatedProgress(label, { from = 0, ceiling = 92, durationMs = 6000 } = {}) {
+function startSimulatedProgress(label, { from = 0, ceiling = 92, durationMs = 6000 } = {}) {
       progressWrap.classList.add('visible');
       progressText.textContent = sanitizeText(label);
       progressBar.classList.add('simulating');

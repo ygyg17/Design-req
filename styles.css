@@ -1,9 +1,5 @@
-/* ══════════════════════════════════════════════════════════════
-   THE SEMINYAK — GRAPHIC DESIGN FORM
-   styles.css
-   ══════════════════════════════════════════════════════════════ */
 
-/* ── Brand Tokens ─────────────────────────────────────────── */
+
 :root {
   --bg:              #f2f2f3;
   --surface:         #ffffff;
@@ -44,8 +40,6 @@
 
   --transition: 0.2s ease;
 }
-
-/* ── Reset ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -58,8 +52,6 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
 }
-
-/* ── Header ───────────────────────────────────────────────── */
 header {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
@@ -142,8 +134,6 @@ header {
   color: var(--text);
   letter-spacing: -0.2px;
 }
-
-/* ── Main ─────────────────────────────────────────────────── */
 main {
   flex: 1;
   padding: 48px 20px;
@@ -151,8 +141,6 @@ main {
   justify-content: center;
   align-items: flex-start;
 }
-
-/* ── Card ─────────────────────────────────────────────────── */
 .card {
   background: var(--surface);
   width: 100%;
@@ -162,8 +150,6 @@ main {
   box-shadow: var(--shadow-md);
   border: 1px solid rgba(0,0,0,0.04);
 }
-
-/* ── Card Heading ─────────────────────────────────────────── */
 .card-heading {
   margin-bottom: 28px;
 }
@@ -183,8 +169,6 @@ main {
   line-height: 1.5;
   font-weight: 400;
 }
-
-/* ── Notice ───────────────────────────────────────────────── */
 .notice {
   background: var(--gold-tint);
   color: var(--gold-hover);
@@ -201,8 +185,6 @@ main {
 }
 
 .notice svg { flex-shrink: 0; }
-
-/* ── Form Layout ──────────────────────────────────────────── */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -240,8 +222,6 @@ label {
   margin-top: 5px;
   min-height: 16px;
 }
-
-/* ── Inputs ───────────────────────────────────────────────── */
 input[type="text"],
 input[type="email"],
 input[type="date"],
@@ -276,8 +256,6 @@ textarea {
   min-height: 110px;
   line-height: 1.6;
 }
-
-/* ── Select ───────────────────────────────────────────────── */
 .select-wrapper {
   position: relative;
 }
@@ -312,8 +290,6 @@ select:focus {
   pointer-events: none;
   color: var(--text-muted);
 }
-
-/* ── File Upload ──────────────────────────────────────────── */
 .file-drop-area {
   position: relative;
   display: flex;
@@ -373,8 +349,6 @@ select:focus {
   font-size: 12px;
   color: var(--text-muted);
 }
-
-/* ── Button ───────────────────────────────────────────────── */
 button {
   background: var(--gold);
   color: #fff;
@@ -477,8 +451,6 @@ button:disabled {
 }
 
 .link-btn:hover { color: var(--gold-hover); transform: none; box-shadow: none; }
-
-/* ── Spinner ──────────────────────────────────────────────── */
 .spinner {
   display: none;
   width: 17px;
@@ -491,8 +463,6 @@ button:disabled {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Toast ────────────────────────────────────────────────── */
 #toast {
   position: fixed;
   bottom: -100px;
@@ -513,8 +483,6 @@ button:disabled {
 #toast.show    { bottom: 28px; }
 #toast.success { background: var(--success); }
 #toast.error   { background: var(--error); }
-
-/* ── Footer ───────────────────────────────────────────────── */
 footer {
   text-align: center;
   padding: 24px;
@@ -534,17 +502,10 @@ footer a {
 
 footer a:hover { text-decoration: underline; }
 
-/* ═══════════════════════════════════════════════════════════
-   ADMIN DASHBOARD
-   ══════════════════════════════════════════════════════════ */
-
-/* ── Login Card ───────────────────────────────────────────── */
 .login-card {
   max-width: 440px;
   margin: 0 auto;
 }
-
-/* ── Dashboard Card ───────────────────────────────────────── */
 .dashboard-card {
   max-width: 1040px;
   padding: 36px 40px;
@@ -588,8 +549,6 @@ footer a:hover { text-decoration: underline; }
   font-size: 13.5px;
   border-radius: var(--radius-sm);
 }
-
-/* ── Stats Strip ──────────────────────────────────────────── */
 .stats-strip {
   display: flex;
   gap: 10px;
@@ -614,8 +573,6 @@ footer a:hover { text-decoration: underline; }
 
 .stat-num   { font-size: 16px; font-weight: 700; }
 .stat-label { font-size: 12px; font-weight: 500; opacity: 0.85; }
-
-/* ── Table ────────────────────────────────────────────────── */
 .table-wrapper {
   overflow-x: auto;
   border-radius: var(--radius-lg);
@@ -676,8 +633,6 @@ tbody tr:hover { background: var(--surface-raised); }
 }
 
 .action-cell { white-space: nowrap; }
-
-/* ── Requester Cell ───────────────────────────────────────── */
 .requester-cell {
   display: flex;
   flex-direction: column;
@@ -693,13 +648,9 @@ tbody tr:hover { background: var(--surface-raised); }
   font-size: 12px;
   color: var(--text-muted);
 }
-
-/* ── Date Cell ────────────────────────────────────────────── */
 .date-cell { color: var(--text-muted); font-size: 13px; }
 
 .date-cell.overdue { color: var(--error); font-weight: 600; }
-
-/* ── Note Cell ────────────────────────────────────────────── */
 .note-text {
   display: block;
   max-width: 240px;
@@ -709,8 +660,6 @@ tbody tr:hover { background: var(--surface-raised); }
   color: var(--text-muted);
   line-height: 1.45;
 }
-
-/* ── File Link ────────────────────────────────────────────── */
 .file-link {
   display: inline-flex;
   align-items: center;
@@ -722,8 +671,6 @@ tbody tr:hover { background: var(--surface-raised); }
 }
 
 .file-link:hover { color: var(--gold-hover); text-decoration: underline; }
-
-/* ── Badges ───────────────────────────────────────────────── */
 .badge {
   display: inline-block;
   padding: 3px 10px;
@@ -745,8 +692,6 @@ tbody tr:hover { background: var(--surface-raised); }
   color: var(--success);
   border-color: var(--success-border);
 }
-
-/* ── Done Check ───────────────────────────────────────────── */
 .done-check {
   display: inline-flex;
   align-items: center;
@@ -755,8 +700,6 @@ tbody tr:hover { background: var(--surface-raised); }
   font-weight: 600;
   color: var(--success);
 }
-
-/* ── Loading Dots ─────────────────────────────────────────── */
 .loading-dots {
   display: inline-flex;
   gap: 4px;
@@ -780,8 +723,6 @@ tbody tr:hover { background: var(--surface-raised); }
   0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
   40%            { transform: scale(1);   opacity: 1; }
 }
-
-/* ── Error Field (Login) ──────────────────────────────────── */
 #loginError {
   display: block;
   font-size: 13px;
@@ -791,11 +732,6 @@ tbody tr:hover { background: var(--surface-raised); }
   min-height: 18px;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   ADMIN HUB — extracted from inline styles
-   ══════════════════════════════════════════════════════════ */
-
-/* ── Header (admin variant) ──────────────────────────────── */
 .admin-header-row {
   justify-content: space-between;
   width: 100%;
@@ -834,8 +770,6 @@ tbody tr:hover { background: var(--surface-raised); }
 .admin-main { padding-top: 32px; }
 
 .admin-dashboard-card { max-width: 1040px; width: 100%; }
-
-/* ── Tab Bar ──────────────────────────────────────────────── */
 .admin-tab-bar {
   display: flex;
   gap: 10px;
@@ -859,12 +793,8 @@ tbody tr:hover { background: var(--surface-raised); }
 }
 
 .admin-logout-btn { margin-left: auto; }
-
-/* ── Table variants ───────────────────────────────────────── */
 .admin-table--clickable { cursor: pointer; }
 .admin-table--static    { cursor: default; }
-
-/* ── Link Bank ────────────────────────────────────────────── */
 .link-bank-view { display: none; }
 
 .link-form-panel {
@@ -936,8 +866,6 @@ tbody tr:hover { background: var(--surface-raised); }
   background: var(--success-bg) !important;
   color: var(--success) !important;
 }
-
-/* ── Modal ────────────────────────────────────────────────── */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -1089,8 +1017,6 @@ tbody tr:hover { background: var(--surface-raised); }
   transform: none;
   box-shadow: none;
 }
-
-/* ── Confirm Dialog ───────────────────────────────────────── */
 .confirm-overlay {
   display: none;
   position: fixed;
@@ -1155,11 +1081,6 @@ tbody tr:hover { background: var(--surface-raised); }
 }
 
 .confirm-delete-btn .spinner { border-top-color: #fff; }
-
-/* ═══════════════════════════════════════════════════════════
-   RESPONSIVE
-   ══════════════════════════════════════════════════════════ */
-
 @media (max-width: 720px) {
   .card {
     padding: 28px 24px;
@@ -1199,8 +1120,6 @@ tbody tr:hover { background: var(--surface-raised); }
   .brand-name { font-size: 15px; }
   footer { flex-direction: column; gap: 6px; }
 }
-
-/* The Seminyak Assistant */
 .ai-assistant,
 .ai-assistant * {
   box-sizing: border-box;
