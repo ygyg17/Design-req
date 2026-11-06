@@ -542,9 +542,8 @@
       if (!deadline)
         { setError('deadline', 'Please set a required deadline.'); ok = false; }
       else {
-        const today = new Date(); today.setHours(0,0,0,0);
-        const dl    = new Date(deadline + 'T00:00:00');
-        if (dl < today) { setError('deadline', 'Deadline cannot be in the past.'); ok = false; }
+        const dl = new Date(deadline + 'T00:00:00');
+        if (dl < getMinDeadlineDate()) { setError('deadline', 'Deadline must be at least 2 days (H+2) from today.'); ok = false; }
       }
 
       if (selectedFiles.length === 0)
@@ -666,6 +665,23 @@ function startSimulatedProgress(label, { from = 0, ceiling = 92, durationMs = 60
 
     document.getElementById('rateWarning').classList.remove('visible');
     document.getElementById('submitBtn').disabled = false;
+
+    /* ─── Deadline minimal H+2 ─── */
+    const MIN_DEADLINE_DAYS = 2;
+
+    function getMinDeadlineDate() {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() + MIN_DEADLINE_DAYS);
+      return d;
+    }
+
+    (function applyDeadlineMin() {
+      const d   = getMinDeadlineDate();
+      const pad = n => String(n).padStart(2, '0');
+      document.getElementById('deadline').min =
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    })();
 
     document.getElementById('designForm').addEventListener('submit', async e => {
       e.preventDefault();
